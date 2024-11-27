@@ -77,3 +77,6 @@ bin/deploy
 *.zsh
 .tool-versions
 *.code-workspace
+*.zsh
+.tool-versions
+*.code-workspace

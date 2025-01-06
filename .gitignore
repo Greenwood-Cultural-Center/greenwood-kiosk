@@ -80,3 +80,4 @@ bin/deploy
 *.zsh
 .tool-versions
 *.code-workspace
+*.old

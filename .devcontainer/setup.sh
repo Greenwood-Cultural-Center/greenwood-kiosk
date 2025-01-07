@@ -2,7 +2,7 @@
 echo -e "\e[33mSetting up the dev container...\e[0m"
 echo -e "\e[33mInstalling dependencies...\e[0m"
 sudo apt-get update && export DEBIAN_FRONTEND=noninteractive && sudo apt-get -y install --no-install-recommends libvips libvips-dev libvips-tools libpq-dev python3-pygments
-echo -e "\e[33mconfiguring dotfiles...\e[0m"
+echo -e "\e[33mConfiguring dotfiles...\e[0m"
 sudo mkdir /root/.config
 cd /root/.config
 git config --global init.defaultBranch main

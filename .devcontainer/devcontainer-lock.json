@@ -43,6 +43,11 @@
       "resolved": "ghcr.io/eitsupi/devcontainer-features/jq-likes@sha256:6a8b044f9f424097ec6d212167836b26994a76a556cbcb202084be79fe8032bd",
       "integrity": "sha256:6a8b044f9f424097ec6d212167836b26994a76a556cbcb202084be79fe8032bd"
     },
+    "ghcr.io/itsmechlark/features/postgresql:1": {
+      "version": "1.5.0",
+      "resolved": "ghcr.io/itsmechlark/features/postgresql@sha256:a899d480c4a00dde33031f7928784ae0fe92a924d30c273c3583515f172f46f3",
+      "integrity": "sha256:a899d480c4a00dde33031f7928784ae0fe92a924d30c273c3583515f172f46f3"
+    },
     "ghcr.io/joshuanianji/devcontainer-features/github-cli-persistence:1": {
       "version": "1.0.3",
       "resolved": "ghcr.io/joshuanianji/devcontainer-features/github-cli-persistence@sha256:757843d75915f140ec22bc16ccb5e657a910d9b1d1f445d15350a78e584d130f",

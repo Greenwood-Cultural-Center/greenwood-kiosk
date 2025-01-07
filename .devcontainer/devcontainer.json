@@ -11,6 +11,9 @@
             "installOhMyZsh": true,
             "upgradePackages": true
         },
+        "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+            "packages": "libvips,libvips-dev,libvips-tools,libpq-dev,python3-pygments"
+        },
         "ghcr.io/itsmechlark/features/postgresql:1": {
             "version": "latest"
         },
@@ -55,7 +58,7 @@
     "portsAttributes": {"db:5432": {"label": "DB port"},"kiosk:3000": {"label": "Application port"}},
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "/workspaces/greenwood-kiosk/.devcontainer/setup.sh",
+    "postCreateCommand": ["/bin/sh", "-c", "/usr/bin/zsh /workspaces/greenwood-kiosk/.devcontainer/setup.sh"],
 
     "customizations": {
         "vscode": {

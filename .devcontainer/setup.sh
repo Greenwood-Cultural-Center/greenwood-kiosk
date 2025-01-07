@@ -1,7 +1,5 @@
 #!/usr/bin/zsh
 echo -e "\e[33mSetting up the dev container...\e[0m"
-echo -e "\e[33mInstalling dependencies...\e[0m"
-sudo apt-get update && export DEBIAN_FRONTEND=noninteractive && sudo apt-get -y install --no-install-recommends libvips libvips-dev libvips-tools libpq-dev python3-pygments
 echo -e "\e[33mConfiguring dotfiles...\e[0m"
 sudo mkdir /root/.config
 cd /root/.config
@@ -26,3 +24,27 @@ echo -e "\e[33mInstalling Gems...\e[0m"
 bundle install
 echo -e "\e[33mInstalling NPM packages...\e[0m"
 yarn install
+if [ -e .env ]; then
+    echo -e "\e[33m.env file found: skipping creation\e[0m"
+else
+    echo -e "\e[33mSetting up the environment...\e[0m"
+    cp .exampleenv .env
+fi
+echo -e "\e[33mCreating the secret key env vars...\e[0m"
+devise_secret=$(rails secret)
+secret_key_base=$(rails secret)
+
+export DEVISE_SECRET_KEY=$devise_secret
+export SECRET_KEY_BASE=$secret_key_base
+
+echo -e "\e[33mSetting up the database...\e[0m"
+if [ -e config/database.yml ]; then
+    echo -e "\e[33mdatabase.yml file found: skipping creation\e[0m"
+else
+    echo -e "\e[33mCreating database.yml file...\e[0m"
+    cp config/database.example.yml config/database.yml
+fi
+echo -e "\e[33mCreating the database...\e[0m"
+rails db:create
+echo -e "\e[33mLoading schema and seeding the DB...\e[0m"
+rails db:schema:load db:seed

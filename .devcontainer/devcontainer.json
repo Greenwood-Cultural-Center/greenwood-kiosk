@@ -11,6 +11,9 @@
             "installOhMyZsh": true,
             "upgradePackages": true
         },
+        "ghcr.io/itsmechlark/features/postgresql:1": {
+            "version": "latest"
+        },
         "ghcr.io/devcontainers/features/github-cli:1": {
             "installDirectlyFromGitHubRelease": true,
             "version": "latest"
@@ -22,7 +25,7 @@
             "nvmVersion": "0.39"
         },
         "ghcr.io/devcontainers/features/ruby:1": {
-            "version": "latest"
+            "version": "3.3.6"
         },
         "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
         "ghcr.io/eitsupi/devcontainer-features/jq-likes:2.1.1": {

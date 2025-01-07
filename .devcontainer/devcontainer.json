@@ -107,7 +107,8 @@
                 "miguel-savignano.ruby-symbols",
                 "hridoy.rails-snippets",
                 "borama.ruby-slim",
-                "aki77.rails-routes"
+                "aki77.rails-routes",
+                "medo64.render-crlf"
             ]
         }
     },

@@ -24,12 +24,27 @@ namespace :import do
         enum_dist: row['Enum Dist'],
         page_number: row['Sheet'],
         page_side: row['Side'],
-        line_number: row['Line']
+        line_number: row['Line'],
       )
+      record.sex = row['sex']
+      record.race = row['race']
+      record.institution =row['institution']
+      record.owned_or_rented = row['owned_or_rented']
+      record.mortgage = row['mortgage']
+      record.age_months = row['age_months']
+      record.marital_status = row['marital_status']
+      record.foreign_born = row['foreign_born']
+      record.naturalized_alien = row['naturalized_alien']
+      record.can_read = row['can_read']
+      record.can_write = row['can_write']
+      record.street_prefix = row['Prefix']
+      record.street_suffix = row['Suffix']
+      record.attended_school = row['attended_school']
+
 
       row.each do |key, value|
         if key == 'Locality'
-          record.locality = Locality.find_or_create_by(name: value)
+          record.locality = Locality.find_or_create_by(name: value,short_name:value)
         elsif !value.nil? && value != ''
           attribute = DataDictionary.field_from_label(key, year) rescue nil
           if attribute && record.has_attribute?(attribute) && attribute != 'person_id'
@@ -38,14 +53,30 @@ namespace :import do
             elsif DataDictionary.coded_attribute?(attribute)
               code = DataDictionary.code_from_label(key, value)
               record[attribute] = code
+
+
+
             else
+              
               record[attribute] = value
+
+
+
+
             end
+           
           end
         end
       end
 
       record.created_by = User.first
+      record.pob = row['Place Of Birth']
+      record.pob_father= row['Place Of Birth - Father']
+      record.pob_mother= row['Place Of Birth - Mother']
+      record.can_speak_english = row['can_speak_english']
+      record.employment =  row['employment']
+      
+
 
       address = Address.find_or_initialize_by house_number: record.street_house_number,
                                               prefix: record.street_prefix,

@@ -58,6 +58,11 @@
       "resolved": "ghcr.io/meaningful-ooo/devcontainer-features/homebrew@sha256:7a291ba9b8b4bced1172c22f8afc77c3c7ff3ecef49f15e94e626cae47777a32",
       "integrity": "sha256:7a291ba9b8b4bced1172c22f8afc77c3c7ff3ecef49f15e94e626cae47777a32"
     },
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      "version": "1.0.2",
+      "resolved": "ghcr.io/rocker-org/devcontainer-features/apt-packages@sha256:87a4d7750a596a5db034ba8508782f31aebdc2ffe955c66aaecb33d9de2ecdae",
+      "integrity": "sha256:87a4d7750a596a5db034ba8508782f31aebdc2ffe955c66aaecb33d9de2ecdae"
+    },
     "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {
       "version": "0.0.3",
       "resolved": "ghcr.io/stuartleeks/dev-container-features/shell-history@sha256:6caee1863304394cbd58f815757a55bce3f9150a4396ca8e2703683367e919ac",

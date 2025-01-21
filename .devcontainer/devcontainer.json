@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-    "name": "Ubuntu",
+    "name": "Kiosk",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/base:noble",
     "features": {
@@ -54,14 +54,40 @@
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
 
-    "forwardPorts": ["kiosk:3000","db:5432"],
-    "portsAttributes": {"db:5432": {"label": "DB port"},"kiosk:3000": {"label": "Application port"}},
+    "forwardPorts": ["3000:3000","5432:5432"],
+    "portsAttributes": {"5432:5432": {"label": "DB port"},"3000:3000": {"label": "Application port"}},
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": ["/bin/sh", "-c", "/usr/bin/zsh /workspaces/greenwood-kiosk/.devcontainer/setup.sh"],
+    "onCreateCommand": "/usr/bin/zsh .devcontainer/setup.sh",
+    "postCreateCommand": "/usr/bin/zsh /workspaces/greenwood-kiosk/.devcontainer/postSetup.sh",
+    "postStartCommand": "service postgresql start",
+
+    "remoteEnv": {
+        "GEMPATH": "/usr/local/rvm/gems/ruby-3.3.6",
+        "SHELL": "/usr/bin/zsh",
+    },
+    "containerEnv": {
+        "GEMPATH": "/usr/local/rvm/gems/ruby-3.3.6",
+        "SHELL": "/usr/bin/zsh",
+    },
 
     "customizations": {
         "vscode": {
+            "settings": {
+                "files.eol": "\n",
+                "code-eol.highlightNonDefault": true,
+                "terminal.integrated.scrollback": 30000,
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "terminal.integrated.automationProfile.linux": {
+                    "path": "/usr/bin/zsh"
+                },
+                "terminal.integrated.fontLigatures": true,
+                "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono','Fira Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+                "rubyLsp.formatter": "rubocop_internal",
+                "rubyLsp.rubyVersionManager": {
+                    "identifier": "rvm"
+                }
+            },
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
@@ -79,6 +105,7 @@
                 "msjsdiag.debugger-for-chrome",
                 "msjsdiag.vscode-react-native",
                 "michelemelluso.code-beautifier",
+                "mechatroner.rainbow-csv",
                 "chouzz.vscode-better-align",
                 "naumovs.color-highlight",
                 "anseki.vscode-color",
@@ -111,10 +138,12 @@
                 "hridoy.rails-snippets",
                 "borama.ruby-slim",
                 "aki77.rails-routes",
-                "medo64.render-crlf"
+                "medo64.render-crlf",
+                "ReprEng.csv"
             ]
         }
     },
+    "containerUser": "root",
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     "remoteUser": "root"

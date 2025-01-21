@@ -52,6 +52,7 @@ gem 'sprockets-rails'
 group :development do
   gem 'annotate'
   gem 'byebug'
+  gem 'debug'
   gem 'get_process_mem'
   gem 'letter_opener'
   gem 'letter_opener_web'

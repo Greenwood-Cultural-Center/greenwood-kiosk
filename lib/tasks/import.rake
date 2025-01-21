@@ -4,10 +4,10 @@
 # CSV button on HistoryForge.
 namespace :import do
   task census: :environment do
-    year = ENV['YEAR']
+    year = ENV.fetch('YEAR', nil)
     raise ArgumentError('You must pass in a YEAR argument') if year.blank?
 
-    csv_file = ENV['FILE']
+    csv_file = ENV.fetch('FILE', nil)
     raise ArgumentError('You must pass in a valid file path as the FILE argument') unless File.exist?(csv_file)
 
     rows_count = 0
@@ -31,10 +31,13 @@ namespace :import do
         if key == 'Locality'
           record.locality = Locality.find_or_create_by(name: value)
         elsif !value.nil? && value != ''
-          attribute = DataDictionary.field_from_label(key, year) rescue nil
+          attribute = begin
+            DataDictionary.field_from_label(key, year)
+          rescue StandardError
+            nil
+          end
           if attribute && record.has_attribute?(attribute) && attribute != 'person_id'
-          dc_attribute = attribute&.downcase
-          if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
+            dc_attribute = attribute&.downcase
             if value == 'Yes'
               record[dc_attribute] = true
             elsif DataDictionary.coded_attribute?(dc_attribute)

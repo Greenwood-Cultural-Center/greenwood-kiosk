@@ -63,7 +63,8 @@ group :development do
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
-  gem 'ruby-lsp', '~> 0.3.7', require: false
+  gem 'ruby-lsp'
+  gem 'ruby-lsp-rails'
   gem 'simplecov', require: false
   # gem 'standard'
   gem 'web-console'

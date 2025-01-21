@@ -33,13 +33,15 @@ namespace :import do
         elsif !value.nil? && value != ''
           attribute = DataDictionary.field_from_label(key, year) rescue nil
           if attribute && record.has_attribute?(attribute) && attribute != 'person_id'
+          dc_attribute = attribute&.downcase
+          if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
             if value == 'Yes'
-              record[attribute] = true
-            elsif DataDictionary.coded_attribute?(attribute)
-              code = DataDictionary.code_from_label(key, value)
-              record[attribute] = code
+              record[dc_attribute] = true
+            elsif DataDictionary.coded_attribute?(dc_attribute)
+              code = DataDictionary.code_from_label(value, dc_attribute)
+              record[dc_attribute] = code
             else
-              record[attribute] = value
+              record[dc_attribute] = value
             end
           end
         end
@@ -70,5 +72,4 @@ namespace :import do
 
     puts "Managed to load #{saved_count} of #{rows_count} records.\n"
   end
-
 end

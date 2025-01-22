@@ -26,21 +26,6 @@ namespace :import do
         page_side: row['Side'],
         line_number: row['Line']
       )
-      #record.sex = row['sex']
-      #record.race = row['race']
-      #record.institution = row['institution']
-      #record.owned_or_rented = row['owned_or_rented']
-      #record.mortgage = row['mortgage']
-      #record.age_months = row['age_months']
-      #record.marital_status = row['marital_status']
-      #record.foreign_born = row['foreign_born']
-      #record.naturalized_alien = row['naturalized_alien']
-      #record.can_read = row['can_read']
-      #record.can_write = row['can_write']
-      #record.street_prefix = row['Prefix']
-      #record.street_suffix = row['Suffix']
-      #record.attended_school = row['attended_school']
-
 
       row.each do |key, value|
         if key == 'Locality'
@@ -50,39 +35,19 @@ namespace :import do
           dc_attribute = attribute&.downcase&.strip
           if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
             
-          
-            
             if value == 'Yes'
               record[dc_attribute] = true
             elsif DataDictionary.coded_attribute?(dc_attribute)
               code = DataDictionary.code_from_label(value, dc_attribute)
-              
               record[dc_attribute] = code
-
-
-
             else
-              
               record[dc_attribute] = value
-
-
-
-
             end
-
-          
         end
       end
     end
 
       record.created_by = User.first
-      #record.pob = row['Place Of Birth']
-      #record.pob_father = row['Place Of Birth - Father']
-      #record.pob_mother = row['Place Of Birth - Mother']
-      #record.can_speak_english = row['can_speak_english']
-      #record.employment = row['employment']
-
-
 
       address = Address.find_or_initialize_by house_number: record.street_house_number,
                                               prefix: record.street_prefix,

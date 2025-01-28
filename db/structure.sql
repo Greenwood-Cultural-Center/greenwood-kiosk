@@ -1,7 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
--- SET transaction_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -9,13 +9,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -57,6 +50,8 @@ $_$;
 
 
 SET default_tablespace = '';
+
+SET default_table_access_method = heap;
 
 --
 -- Name: action_text_rich_texts; Type: TABLE; Schema: public; Owner: -
@@ -486,7 +481,8 @@ CREATE TABLE public.buildings (
     locality_id bigint,
     building_types_mask integer,
     parent_id bigint,
-    hive_year integer
+    hive_year integer,
+    parcel_id bigint
 );
 
 
@@ -2150,6 +2146,39 @@ ALTER SEQUENCE public.occupation1930_codes_id_seq OWNED BY public.occupation1930
 
 
 --
+-- Name: parcels; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.parcels (
+    id bigint NOT NULL,
+    boundaries json,
+    name character varying,
+    notes text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: parcels_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.parcels_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: parcels_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.parcels_id_seq OWNED BY public.parcels.id;
+
+
+--
 -- Name: people; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3152,6 +3181,13 @@ ALTER TABLE ONLY public.occupation1930_codes ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: parcels id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parcels ALTER COLUMN id SET DEFAULT nextval('public.parcels_id_seq'::regclass);
+
+
+--
 -- Name: people id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3597,6 +3633,14 @@ ALTER TABLE ONLY public.occupation1930_codes
 
 
 --
+-- Name: parcels parcels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parcels
+    ADD CONSTRAINT parcels_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: people people_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3963,6 +4007,13 @@ CREATE INDEX index_buildings_on_lining_type_id ON public.buildings USING btree (
 --
 
 CREATE INDEX index_buildings_on_locality_id ON public.buildings USING btree (locality_id);
+
+
+--
+-- Name: index_buildings_on_parcel_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_buildings_on_parcel_id ON public.buildings USING btree (parcel_id);
 
 
 --
@@ -5217,6 +5268,14 @@ ALTER TABLE ONLY public.professions
 
 
 --
+-- Name: buildings fk_rails_8be8136b24; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.buildings
+    ADD CONSTRAINT fk_rails_8be8136b24 FOREIGN KEY (parcel_id) REFERENCES public.parcels(id);
+
+
+--
 -- Name: videos fk_rails_8cfa78eceb; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5610,6 +5669,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('9'),
 ('8'),
 ('4'),
+('20250128192459'),
+('20250128192217'),
 ('20241208172541'),
 ('20241124000534'),
 ('20240824170019'),

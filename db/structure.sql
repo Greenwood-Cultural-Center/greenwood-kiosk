@@ -2151,9 +2151,21 @@ ALTER SEQUENCE public.occupation1930_codes_id_seq OWNED BY public.occupation1930
 
 CREATE TABLE public.parcels (
     id bigint NOT NULL,
-    boundaries json,
-    name character varying,
-    notes text,
+    parcelid integer,
+    sheet integer,
+    "row" integer,
+    block integer,
+    book integer,
+    page integer,
+    grantor character varying,
+    grantee character varying,
+    instrument character varying,
+    subdivision character varying,
+    dl boolean,
+    document_link character varying,
+    contact_link character varying,
+    lots integer[] DEFAULT '{}'::integer[],
+    date date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

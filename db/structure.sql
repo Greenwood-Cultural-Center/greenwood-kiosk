@@ -481,8 +481,7 @@ CREATE TABLE public.buildings (
     locality_id bigint,
     building_types_mask integer,
     parent_id bigint,
-    hive_year integer,
-    parcel_id bigint
+    hive_year integer
 );
 
 
@@ -4022,13 +4021,6 @@ CREATE INDEX index_buildings_on_locality_id ON public.buildings USING btree (loc
 
 
 --
--- Name: index_buildings_on_parcel_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_buildings_on_parcel_id ON public.buildings USING btree (parcel_id);
-
-
---
 -- Name: index_buildings_on_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5280,14 +5272,6 @@ ALTER TABLE ONLY public.professions
 
 
 --
--- Name: buildings fk_rails_8be8136b24; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.buildings
-    ADD CONSTRAINT fk_rails_8be8136b24 FOREIGN KEY (parcel_id) REFERENCES public.parcels(id);
-
-
---
 -- Name: videos fk_rails_8cfa78eceb; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5681,7 +5665,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('9'),
 ('8'),
 ('4'),
-('20250128192459'),
 ('20250128192217'),
 ('20241208172541'),
 ('20241124000534'),

@@ -1,6 +1,6 @@
-class CreateParcels < ActiveRecord::Migration[7.2]
+class CreatePlats < ActiveRecord::Migration[7.2]
   def change
-    create_table :parcels do |t|
+    create_table :plats do |t|
       t.integer :parcelid
       t.integer :sheet
       t.integer :row

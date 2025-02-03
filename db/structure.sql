@@ -2145,51 +2145,6 @@ ALTER SEQUENCE public.occupation1930_codes_id_seq OWNED BY public.occupation1930
 
 
 --
--- Name: parcels; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.parcels (
-    id bigint NOT NULL,
-    parcelid integer,
-    sheet integer,
-    "row" integer,
-    block integer,
-    book integer,
-    page integer,
-    grantor character varying,
-    grantee character varying,
-    instrument character varying,
-    subdivision character varying,
-    dl boolean,
-    document_link character varying,
-    contact_link character varying,
-    lots integer[] DEFAULT '{}'::integer[],
-    date date,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: parcels_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.parcels_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: parcels_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.parcels_id_seq OWNED BY public.parcels.id;
-
-
---
 -- Name: people; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2403,6 +2358,51 @@ CREATE SEQUENCE public.photographs_id_seq
 --
 
 ALTER SEQUENCE public.photographs_id_seq OWNED BY public.photographs.id;
+
+
+--
+-- Name: plats; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.plats (
+    id bigint NOT NULL,
+    parcelid integer,
+    sheet integer,
+    "row" integer,
+    block integer,
+    book integer,
+    page integer,
+    grantor character varying,
+    grantee character varying,
+    instrument character varying,
+    subdivision character varying,
+    dl boolean,
+    document_link character varying,
+    contact_link character varying,
+    lots integer[] DEFAULT '{}'::integer[],
+    date date,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: plats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.plats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: plats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.plats_id_seq OWNED BY public.plats.id;
 
 
 --
@@ -3192,13 +3192,6 @@ ALTER TABLE ONLY public.occupation1930_codes ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- Name: parcels id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.parcels ALTER COLUMN id SET DEFAULT nextval('public.parcels_id_seq'::regclass);
-
-
---
 -- Name: people id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3231,6 +3224,13 @@ ALTER TABLE ONLY public.pg_search_documents ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY public.photographs ALTER COLUMN id SET DEFAULT nextval('public.photographs_id_seq'::regclass);
+
+
+--
+-- Name: plats id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.plats ALTER COLUMN id SET DEFAULT nextval('public.plats_id_seq'::regclass);
 
 
 --
@@ -3644,14 +3644,6 @@ ALTER TABLE ONLY public.occupation1930_codes
 
 
 --
--- Name: parcels parcels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.parcels
-    ADD CONSTRAINT parcels_pkey PRIMARY KEY (id);
-
-
---
 -- Name: people people_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3689,6 +3681,14 @@ ALTER TABLE ONLY public.pg_search_documents
 
 ALTER TABLE ONLY public.photographs
     ADD CONSTRAINT photographs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: plats plats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.plats
+    ADD CONSTRAINT plats_pkey PRIMARY KEY (id);
 
 
 --

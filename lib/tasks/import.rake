@@ -29,15 +29,15 @@ namespace :import do
 
       row.each do |key, value|
         if key == 'Locality'
-          record.locality = Locality.find_or_create_by(name: value)
+          record.locality = Locality.find_or_create_by(name: value,short_name:value)
         elsif !value.nil? && value != ''
           attribute = begin
             DataDictionary.field_from_label(key, year)
           rescue StandardError
             nil
           end
-          if attribute && record.has_attribute?(attribute) && attribute != 'person_id'
-            dc_attribute = attribute&.downcase
+          dc_attribute = attribute&.downcase&.strip
+          if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
             if value == 'Yes'
               record[dc_attribute] = true
             elsif DataDictionary.coded_attribute?(dc_attribute)
@@ -46,9 +46,9 @@ namespace :import do
             else
               record[dc_attribute] = value
             end
-          end
         end
       end
+    end
 
       record.created_by = User.first
 

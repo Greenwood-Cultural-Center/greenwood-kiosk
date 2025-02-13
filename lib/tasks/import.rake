@@ -3,7 +3,8 @@
 # The entire purpose of this is for a developer to bootstrap a database with some census records exported with the
 # CSV button on HistoryForge.
 namespace :import do
-  task census: :environment do
+  desc 'Import census file into HistoryForge, updating if it exists'
+  task :census, %i[year import] => [:environment] do |task, args|
     year = ENV.fetch('YEAR', nil)
     raise ArgumentError('You must pass in a YEAR argument') if year.blank?
 
@@ -29,7 +30,7 @@ namespace :import do
 
       row.each do |key, value|
         if key == 'Locality'
-          record.locality = Locality.find_or_create_by(name: value,short_name:value)
+          record.locality = Locality.find_or_create_by(name: value, short_name: value)
         elsif !value.nil? && value != ''
           attribute = begin
             DataDictionary.field_from_label(key, year)
@@ -46,9 +47,9 @@ namespace :import do
             else
               record[dc_attribute] = value
             end
+          end
         end
       end
-    end
 
       record.created_by = User.first
 

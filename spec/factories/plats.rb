@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :parcel do
+  factory :plat do
     boundaries { "" }
     name { "MyString" }
     notes { "MyText" }

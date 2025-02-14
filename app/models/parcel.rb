@@ -1,2 +1,0 @@
-class Parcel < ApplicationRecord
-end

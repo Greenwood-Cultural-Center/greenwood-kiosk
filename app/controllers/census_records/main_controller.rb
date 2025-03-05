@@ -79,9 +79,17 @@ module CensusRecords
     end
 
     def create
+     
       @record = resource_class.new resource_params
       authorize! :create, @record
+      
       @record.created_by = current_user
+      
+     if  resource_class.all.last.nil?
+      @record.id  = 1
+     else
+      @record.id =  resource_class.all.last.id+1
+     end
       if @record.save
         flash[:notice] = 'Census Record saved.'
         after_saved

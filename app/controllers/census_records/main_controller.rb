@@ -85,10 +85,10 @@ module CensusRecords
       
       @record.created_by = current_user
       
-     if  resource_class.all.last.nil?
+     if  resource_class.all.empty?
       @record.id  = 1
      else
-      @record.id =  resource_class.all.last.id+1
+      @record.id = resource_class.all.maximum(:id).next
      end
       if @record.save
         flash[:notice] = 'Census Record saved.'

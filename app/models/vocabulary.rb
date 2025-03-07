@@ -31,7 +31,7 @@ class Vocabulary < ApplicationRecord
   def self.controlled_attribute_for(year, attribute)
     DICTIONARY.each do |vocab, years|
       years[year].each do |field|
-        return by_name(vocab) if field == attribute
+        return by_name(vocab) if field.downcase == attribute.downcase
       end
     end
     nil

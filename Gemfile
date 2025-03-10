@@ -30,7 +30,6 @@ gem 'liquid'
 gem 'memory_profiler'
 gem 'mini_magick'
 gem 'net-smtp', require: false
-gem 'oj'
 gem 'omniauth-facebook'
 gem 'omniauth-rails_csrf_protection'
 gem 'paper_trail'
@@ -48,6 +47,7 @@ gem 'sassc'
 gem 'simple_form'
 gem 'slim'
 gem 'sprockets-rails'
+gem 'sys-proctable', platforms: [:mswin, :mingw, :x64_mingw]
 
 group :development do
   gem 'annotate'
@@ -83,3 +83,4 @@ group :test do
   gem 'faker'
   gem 'rspec-collection_matchers'
 end
+gem "tzinfo-data"

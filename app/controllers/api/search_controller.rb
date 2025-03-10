@@ -12,6 +12,7 @@ module Api
       @video_query = ''
       @photo_query = ''
       @narrative_query = ''
+      @rich_text_query = ''
 
       @census_query = search_query('Census1920Record',@census_query)
       @census1910_query = search_query('Census1910Record',@census1910_query)
@@ -22,7 +23,7 @@ module Api
       @video_query = search_query('Video',@video_query)
       @photo_query = search_query('Photograph',@photo_query)
       @narrative_query = search_query('Narrative',@narrative_query)
-
+      @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
      
       @building_query = @building_query.chomp("OR ")
       @census_query = @census_query.chomp("OR ")
@@ -33,16 +34,17 @@ module Api
       @video_query = @video_query.chomp("OR ")
       @photo_query = @photo_query.chomp("OR ")
       @narrative_query = @narrative_query.chomp("OR ")
-
+      @rich_text_query = @rich_text_query.chomp("OR ")
 
       if params["search"].present?
         if params["year"] == 'Both'
-          #binding.pry
+          
          @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
          @building_photo = Building.joins(:photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
          @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
          @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
          @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_action_text = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
 
          @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
@@ -57,10 +59,15 @@ module Api
          @people_audio1910 = Building.joins(people_1910: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
 
+         @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+
+         @narrative_action_text_story1920 = Building.joins(people_1920: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @narrative_action_text_sources1920 = Building.joins(people_1920: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
 
 
 
-          #binding.pry
+          
           @buildings << @building_photo
          @buildings << @building_video
          @buildings << @building_audio
@@ -79,6 +86,12 @@ module Api
          @buildings << @people_video1910
          @buildings << @people_audio1910
          @buildings << @people_narrative1910
+
+         @buildings << @narrative_action_text_story1910
+         @buildings << @narrative_action_text_sources1910
+
+         @buildings << @narrative_action_text_story1920
+         @buildings << @narrative_action_text_sources1920
          @buildings = @buildings.flatten.uniq
          @buildings = Building.where(id: @buildings)
           
@@ -95,6 +108,10 @@ module Api
           @people_video1910 = Building.joins(people_1910: :videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
           @people_audio1910 = Building.joins(people_1910: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
           @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+
+          @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          @narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          
  
           @buildings << @building_photo
           @buildings << @building_video
@@ -107,6 +124,9 @@ module Api
           @buildings << @people_video1910
           @buildings << @people_audio1910
           @buildings << @people_narrative1910
+
+          @buildings << @narrative_action_text_story1910
+          @buildings << @narrative_action_text_sources1910
 
           @buildings = @buildings.flatten.uniq
           @buildings = Building.where(id: @buildings)
@@ -124,6 +144,9 @@ module Api
          @people_audio1920 = Building.joins(people_1920: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1920 = Building.joins(people_1920: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
 
+         @narrative_action_text_story1920 = Building.joins(people_1920: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @narrative_action_text_sources1920 = Building.joins(people_1920: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+
 
          @buildings << @building_photo
          @buildings << @building_video
@@ -136,6 +159,10 @@ module Api
           @buildings << @people_video1920
           @buildings << @people_audio1920
           @buildings << @people_narrative1920
+
+          @buildings << @narrative_action_text_story1920
+          @buildings << @narrative_action_text_sources1920
+
           @buildings = @buildings.flatten.uniq
           @buildings = Building.where(id: @buildings)
         end

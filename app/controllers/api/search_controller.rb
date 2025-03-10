@@ -180,10 +180,12 @@ module Api
     private def make_feature(record,year)
 
       def get_person(person)
+        person_narratives = []
+        person.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
         person_feature = {
         "person": person,
         "audios": person.audios,
-        "narratives": person.narratives,
+        "narratives": person_narratives,
         "videos": person.videos,
         "photos": person.photos
 

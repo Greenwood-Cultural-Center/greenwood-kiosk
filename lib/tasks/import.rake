@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'benchmark'
+require 'parallel'
 # The entire purpose of this is for a developer to bootstrap a database with some census records exported with the
 # CSV button on HistoryForge.
 namespace :import do
@@ -52,16 +53,18 @@ namespace :import do
 
     rows_count = 0
     saved_count = 0
+    failed_records = []
+    failed_reasons = []
 
     Setting.load
 
     require 'csv'
 
-    failed_records = []
+    rows = CSV.read(csv_file, headers: true)
 
     elapsed = Benchmark.realtime do
-      CSV.foreach(csv_file, headers: true) do |row|
-        puts "Processing row #{rows_count + 2}..."
+      Parallel.each_with_index(rows, in_threads: 10) do |row, index|
+        puts "Processing row #{index + 2}..."
         record = CensusRecord.for_year(year).find_or_initialize_by(
           city: row['City'],
           ward: row['Ward'],
@@ -112,17 +115,27 @@ namespace :import do
           addresses: [address]
         )
 
-        # Not going to sweat if the record doesn't save because this is just for developers to load some census records
         rows_count += 1
         if record.save
           saved_count += 1
         else
-          failed_records << rows_count + 1
+          failed_records << index + 2
+          failed_reasons << record.errors.full_messages.join(', ')
         end
       end
     end
 
     puts "Managed to load #{saved_count} of #{rows_count} records in #{elapsed} seconds.\n"
-    puts "Failed to load records: #{failed_records.join(', ')}" if failed_records.any?
+    if failed_records.any?
+      output = failed_records.each_with_index.map do |row, index|
+        { "row" => row, "reason" => failed_reasons[index] }
+      end
+
+      # Convert to JSON
+      require 'json'
+      json_output = { "failed_records" => output }.to_json
+
+      puts json_output
+    end
   end
 end

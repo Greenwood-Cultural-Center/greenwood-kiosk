@@ -44,7 +44,9 @@ module Api
          @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
          @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
          @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
-         @building_action_text = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+
 
          @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
@@ -72,6 +74,9 @@ module Api
          @buildings << @building_video
          @buildings << @building_audio
          @buildings << @building_narrative
+         @buildings <<  @building_action_text_sources
+         @buildings <<  @building_action_text_story
+
 
          @buildings << @buildings2
          @buildings << @buildings3
@@ -101,7 +106,9 @@ module Api
           @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
           @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
-
+          @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+ 
           @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
           @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
           @people_photo1910 = Building.joins(people_1910: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
@@ -117,6 +124,8 @@ module Api
           @buildings << @building_video
           @buildings << @building_audio
           @buildings << @building_narrative
+          @buildings <<  @building_action_text_sources
+          @buildings <<  @building_action_text_story
           
           @buildings << @buildings3
           @buildings << @buildings_people1910
@@ -136,7 +145,9 @@ module Api
           @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
           @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
-
+          @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+ 
           @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq 
           @buildings_people1920 = Building.joins(:people_1920).where(@person_query1920,:search => "%#{params["search"]}%").ids.uniq
          @people_photo1920 = Building.joins(people_1920: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
@@ -152,6 +163,8 @@ module Api
          @buildings << @building_video
          @buildings << @building_audio
          @buildings << @building_narrative
+         @buildings <<  @building_action_text_sources
+         @buildings <<  @building_action_text_story
 
           @buildings << @buildings2
           @buildings << @buildings_people1920
@@ -209,12 +222,16 @@ module Api
       def get_person(person)
         person_narratives = []
         person.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
+        person_photos = []
+        person.photos.each {|photo| person_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
+
+        
         person_feature = {
         "person": person,
         "audios": person.audios,
         "narratives": person_narratives,
         "videos": person.videos,
-        "photos": person.photos
+        "photos": person_photos
 
 
         }
@@ -223,7 +240,13 @@ module Api
       person_array_1920 =[]
       record.people_1910.each {|person| person_array_1910.append(get_person(person))}
       record.people_1920.each {|person| person_array_1920.append(get_person(person))}
+
+      building_narratives = []
+      record.narratives.each {|narrative| building_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
+      building_photos = []
+      record.photos.each {|photo| building_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       if year == '1920'
+       
             feature = {
           "type": "Feature",
           "geometry": {
@@ -234,9 +257,9 @@ module Api
             "location_id": record.id,
             "title": record.name,
             "building_audios": record.audios,
-            "building_narratives": record.narratives,
+            "building_narratives": building_narratives,
             "building_videos": record.videos,
-            "building_photos": record.photos,
+            "building_photos": building_photos,
             "description": record.full_street_address,
             "1910": [],
             "1920": record.census1920_records,
@@ -256,9 +279,9 @@ module Api
         "location_id": record.id,
         "title": record.name,
         "building_audios": record.audios,
-        "building_narratives": record.narratives,
+        "building_narratives": building_narratives,
         "building_videos": record.videos,
-        "building_photos": record.photos,
+        "building_photos": building_photos,
         "description": record.full_street_address,
         "1910": record.census1910_records,
         "1920": [],
@@ -279,9 +302,9 @@ module Api
         "location_id": record.id,
         "title": record.name,
         "building_audios": record.audios,
-        "building_narratives": record.narratives,
+        "building_narratives": building_narratives,
         "building_videos": record.videos,
-        "building_photos": record.photos,
+        "building_photos": building_photos,
         "description": record.full_street_address,
         "1910": record.census1910_records,
         "1920": record.census1920_records,

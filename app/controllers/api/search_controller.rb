@@ -40,9 +40,9 @@ module Api
         if params["year"] == 'Both'
           
          @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
-         @building_photo = Building.joins(:photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-         @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-         @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_photo = Building.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @building_video = Building.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @building_audio = Building.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
          @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -51,14 +51,14 @@ module Api
          @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings_people1920 = Building.joins(:people_1920).where(@person_query1920,:search => "%#{params["search"]}%").ids.uniq
-         @people_photo1920 = Building.joins(people_1920: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_video1920 = Building.joins(people_1920: :videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_audio1920 = Building.joins(people_1920: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_photo1920 = Building.joins(people_1920: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1920 = Building.joins(people_1920: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
-         @people_photo1910 = Building.joins(people_1910: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_video1910 = Building.joins(people_1910: :videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_audio1910 = Building.joins(people_1910: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_photo1910 = Building.joins(people_1910: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
 
          @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -102,18 +102,18 @@ module Api
           
         elsif params["year"] == '1910'
           @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_photo = Building.joins(:photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_photo = Building.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @building_video = Building.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @building_audio = Building.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
           @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
-          @people_photo1910 = Building.joins(people_1910: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-          @people_video1910 = Building.joins(people_1910: :videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-          @people_audio1910 = Building.joins(people_1910: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+          @people_photo1910 = Building.joins(people_1910: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
           @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
 
           @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -141,18 +141,18 @@ module Api
           @buildings = Building.where(id: @buildings)
         elsif params["year"] == '1920'
           @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_photo = Building.joins(:photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_video = Building.joins(:videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-          @building_audio = Building.joins(:audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_photo = Building.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @building_video = Building.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+          @building_audio = Building.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq 
           @buildings_people1920 = Building.joins(:people_1920).where(@person_query1920,:search => "%#{params["search"]}%").ids.uniq
-         @people_photo1920 = Building.joins(people_1920: :photos).where(@photo_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_video1920 = Building.joins(people_1920: :videos).where(@video_query,:search => "%#{params["search"]}%").ids.uniq
-         @people_audio1920 = Building.joins(people_1920: :audios).where(@audio_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_photo1920 = Building.joins(people_1920: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
+         @people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1920 = Building.joins(people_1920: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
 
          @narrative_action_text_story1920 = Building.joins(people_1920: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq

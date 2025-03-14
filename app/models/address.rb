@@ -59,6 +59,19 @@ class Address < ApplicationRecord
     [house_number, prefix, name, suffix, city].join(' ')
   end
 
+  def self.populate_searchable_text
+     records = Address.all
+
+     records.each{ |record| 
+     record.searchable_text = record.address
+    puts " address being saved: #{record.address}"
+    record.save!
+    }
+
+  end
+
+  
+
   def address_with_year
     year? ? "#{address} (as of #{year})" : address
   end

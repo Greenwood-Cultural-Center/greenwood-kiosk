@@ -28,6 +28,7 @@ class Address < ApplicationRecord
   alias_attribute :street_name, :name
   alias_attribute :street_prefix, :prefix
   alias_attribute :street_suffix, :suffix
+  before_save :create_searchable_text
 
   validates :year, numericality: { minimum: 1500, maximum: 2100, allow_nil: true }
   validates :city, presence: true
@@ -68,6 +69,10 @@ class Address < ApplicationRecord
     record.save!
     }
 
+  end
+
+  def create_searchable_text
+    self.searchable_text = self.address
   end
 
   

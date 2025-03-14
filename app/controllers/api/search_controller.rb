@@ -38,14 +38,15 @@ module Api
 
       if params["search"].present?
         if params["year"] == 'Both'
-          
-         @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
+          @buildings = Building.where(@building_query,:search => "%#{params["search"]}%").ids.uniq
          @building_photo = Building.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @building_video = Building.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @building_audio = Building.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
          @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+
 
 
          @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq
@@ -76,7 +77,7 @@ module Api
          @buildings << @building_narrative
          @buildings <<  @building_action_text_sources
          @buildings <<  @building_action_text_story
-
+         @buildings << @building_action_text_description
 
          @buildings << @buildings2
          @buildings << @buildings3
@@ -108,6 +109,7 @@ module Api
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
           @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
@@ -126,6 +128,7 @@ module Api
           @buildings << @building_narrative
           @buildings <<  @building_action_text_sources
           @buildings <<  @building_action_text_story
+          @buildings << @building_action_text_description
           
           @buildings << @buildings3
           @buildings << @buildings_people1910
@@ -147,6 +150,7 @@ module Api
           @building_narrative = Building.joins(:narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_story = Building.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq 
           @buildings_people1920 = Building.joins(:people_1920).where(@person_query1920,:search => "%#{params["search"]}%").ids.uniq
@@ -165,6 +169,7 @@ module Api
          @buildings << @building_narrative
          @buildings <<  @building_action_text_sources
          @buildings <<  @building_action_text_story
+         @buildings << @building_action_text_description
 
           @buildings << @buildings2
           @buildings << @buildings_people1920
@@ -182,11 +187,9 @@ module Api
       else
         @buildings = Building.all
       end
-      
       @ready_buildings =[]
       
       @buildings.each{|building|  @ready_buildings.append(make_feature(building,params["year"])) } 
-      
       @geojson = build_geojson
       response.set_header('Access-Control-Allow-Origin', '*')
       render json: @geojson
@@ -209,7 +212,6 @@ module Api
    
 
     private def build_geojson
-      
       {
         type: "FeatureCollection",
         features: @ready_buildings
@@ -218,7 +220,6 @@ module Api
     end
 
     private def make_feature(record,year)
-
       def get_person(person)
         person_narratives = []
         person.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
@@ -261,6 +262,7 @@ module Api
             "building_videos": record.videos,
             "building_photos": building_photos,
             "description": record.full_street_address,
+            "rich_description": record.rich_text_description,
             "1910": [],
             "1920": record.census1920_records,
             "1910_people": [],
@@ -283,6 +285,7 @@ module Api
         "building_videos": record.videos,
         "building_photos": building_photos,
         "description": record.full_street_address,
+        "rich_description": record.rich_text_description,
         "1910": record.census1910_records,
         "1920": [],
         "1910_people": person_array_1910,
@@ -306,6 +309,7 @@ module Api
         "building_videos": record.videos,
         "building_photos": building_photos,
         "description": record.full_street_address,
+        "rich_description": record.rich_text_description,
         "1910": record.census1910_records,
         "1920": record.census1920_records,
         "1910_people": person_array_1910,

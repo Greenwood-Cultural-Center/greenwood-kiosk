@@ -66,6 +66,7 @@ class Building < ApplicationRecord
   has_many :children, class_name: 'Building', foreign_key: :parent_id, dependent: :nullify, inverse_of: :parent
 
   has_many :addresses, dependent: :destroy, autosave: true
+  has_many :documents, dependent: :destroy, autosave: true
   accepts_nested_attributes_for :addresses, allow_destroy: true, reject_if: proc { |p| p['name'].blank? }
 
   has_and_belongs_to_many :architects

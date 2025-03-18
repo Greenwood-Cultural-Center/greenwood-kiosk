@@ -42,10 +42,12 @@ class DocumentsController < ApplicationController
     @document = Document.new resource_params
     authorize! :create, @document
     if @document.save
+      binding.pry
       flash[:notice] = 'The document has been saved.'
       redirect_to action: :index, document_category_id: @document.document_category_id
     else
       flash[:error] = 'This document failed to upload. Usually it means the file type is not allowed.'
+      binding.pry
       render :new
     end
   end
@@ -83,7 +85,8 @@ class DocumentsController < ApplicationController
                                      :document_category_id,
                                      :url,
                                      :available_to_public,
-                                     locality_ids: []
+                                     locality_ids: [],
+                                     building_ids: []
   end
 
   def collection

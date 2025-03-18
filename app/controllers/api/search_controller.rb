@@ -255,7 +255,10 @@ module Api
       record.narratives.each {|narrative| building_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
       building_photos = []
       record.photos.each {|photo| building_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
+      
       if year == '1920'
+       
+       
        
             feature = {
           "type": "Feature",
@@ -265,7 +268,7 @@ module Api
           },
           "properties": {
             "location_id": record.id,
-            "title": record.name,
+            "title": record.primary_street_address,
             "building_addresses": record.addresses,
             "building_audios": record.audios,
             "building_narratives": building_narratives,
@@ -289,7 +292,7 @@ module Api
       },
       "properties": {
         "location_id": record.id,
-        "title": record.name,
+        "title":  record.primary_street_address,
         "building_addresses": record.addresses,
         "building_audios": record.audios,
         "building_narratives": building_narratives,
@@ -314,7 +317,7 @@ module Api
       },
       "properties": {
         "location_id": record.id,
-        "title": record.name,
+        "title":  record.primary_street_address,
         "building_addresses": record.addresses,
         "building_audios": record.audios,
         "building_narratives": building_narratives,

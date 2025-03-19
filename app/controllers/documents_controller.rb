@@ -33,7 +33,7 @@ class DocumentsController < ApplicationController
    
     @document = Document.new
     authorize! :create, @document
-    #binding.pry
+    
     if params[:building_id]
       @building =  Building.find(params[:building_id])
       @document.buildings << @building 

@@ -129,7 +129,7 @@
         - narratives.each do |narrative|
           = render 'narratives/narrative', narrative:
 
-    - documents = @building.narratives.accessible_by(current_ability)
+    - documents = @building.documents.accessible_by(current_ability)
     .card class="#{@building.description.blank? ? 'mb-3' : 'empty-card'}"
       .card-header
         = link_to 'Add Documents', new_building_document_path(@building.object), class: 'float-right'

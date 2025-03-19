@@ -131,6 +131,7 @@ Rails.application.routes.draw do
       resources :photographs
       resources :audios
       resources :videos
+      resources :documents
     end
   end
 

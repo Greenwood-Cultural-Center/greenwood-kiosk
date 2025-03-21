@@ -128,7 +128,6 @@ export default class extends Controller {
 
   addBuilding(id, address, lat, lon) {
     const formId = `documents_building_ids_${id}`
-    debugger;
     $(`#${formId}`).closest('.form-check').remove()
     const html = `<div class="form-check"><input type="checkbox" class="form-check-input" name="${this.paramKey}[building_ids][]" id="${formId}" value="${id}" checked /><label class="form-check-label" for="${formId}">${address}</label></div>`
     $(`.${this.paramKey}_building_ids`).append(html)

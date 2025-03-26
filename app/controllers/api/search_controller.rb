@@ -14,6 +14,7 @@ module Api
       @narrative_query = ''
       @rich_text_query = ''
       @address_query = ''
+      @documents_query = ''
 
       @census_query = search_query('Census1920Record',@census_query)
       @census1910_query = search_query('Census1910Record',@census1910_query)
@@ -26,6 +27,7 @@ module Api
       @narrative_query = search_query('Narrative',@narrative_query)
       @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
       @address_query = search_query('Address',@address_query)
+      @documents_query = search_query('Document',@documents_query)
      
       @building_query = @building_query.chomp("OR ")
       @census_query = @census_query.chomp("OR ")
@@ -38,6 +40,7 @@ module Api
       @narrative_query = @narrative_query.chomp("OR ")
       @rich_text_query = @rich_text_query.chomp("OR ")
       @address_query  = @address_query.chomp("OR ")
+      @documents_query  = @documents_query.chomp("OR ")
 
       if params["search"].present?
         if params["year"] == 'Both'
@@ -50,6 +53,7 @@ module Api
          @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @building_address = Building.joins(:addresses).where(@address_query,:search => "%#{params["search"]}%").ids.uniq
+         @building_document = Building.joins(:documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
 
 
 
@@ -83,6 +87,7 @@ module Api
          @buildings <<  @building_action_text_story
          @buildings << @building_action_text_description
          @buildings << @building_address
+         @buildings << @building_document
 
          @buildings << @buildings2
          @buildings << @buildings3
@@ -116,6 +121,7 @@ module Api
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_address = Building.joins(:addresses).where(@address_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_document = Building.joins(:documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings3 = Building.joins(:census1910_records).where(@census1910_query,:search => "%#{params["search"]}%").ids.uniq
           @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
@@ -136,6 +142,7 @@ module Api
           @buildings <<  @building_action_text_story
           @buildings << @building_action_text_description
           @buildings << @building_address
+          @buildings << @building_document
           
           @buildings << @buildings3
           @buildings << @buildings_people1910
@@ -159,6 +166,7 @@ module Api
           @building_action_text_sources = Building.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_action_text_description = Building.joins(:rich_text_description).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @building_address = Building.joins(:addresses).where(@address_query,:search => "%#{params["search"]}%").ids.uniq
+          @building_document = Building.joins(:documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
  
           @buildings2 = Building.joins(:census1920_records).where(@census_query,:search => "%#{params["search"]}%").ids.uniq 
           @buildings_people1920 = Building.joins(:people_1920).where(@person_query1920,:search => "%#{params["search"]}%").ids.uniq
@@ -179,6 +187,7 @@ module Api
          @buildings <<  @building_action_text_story
          @buildings << @building_action_text_description
          @buildings << @building_address
+         @buildings << @building_document
 
           @buildings << @buildings2
           @buildings << @buildings_people1920
@@ -272,6 +281,7 @@ module Api
             "building_addresses": record.addresses,
             "building_audios": record.audios,
             "building_narratives": building_narratives,
+            "building_documents": record.documents,
             "building_videos": record.videos,
             "building_photos": building_photos,
             "description": record.full_street_address,
@@ -296,6 +306,7 @@ module Api
         "building_addresses": record.addresses,
         "building_audios": record.audios,
         "building_narratives": building_narratives,
+        "building_documents": record.documents,
         "building_videos": record.videos,
         "building_photos": building_photos,
         "description": record.full_street_address,
@@ -321,6 +332,7 @@ module Api
         "building_addresses": record.addresses,
         "building_audios": record.audios,
         "building_narratives": building_narratives,
+        "building_documents": record.documents,
         "building_videos": record.videos,
         "building_photos": building_photos,
         "description": record.full_street_address,

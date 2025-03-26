@@ -10,6 +10,7 @@ module Api
       @person_query1920 = ''
       @audio_query = ''
       @video_query = ''
+      @documents_query = ''
       @photo_query = ''
       @narrative_query = ''
       @rich_text_query = ''
@@ -26,6 +27,7 @@ module Api
       @narrative_query = search_query('Narrative',@narrative_query)
       @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
       @address_query = search_query('Address',@address_query)
+      @documents_query = search_query('Document',@documents_query)
      
       @building_query = @building_query.chomp("OR ")
       @census_query = @census_query.chomp("OR ")
@@ -38,6 +40,7 @@ module Api
       @narrative_query = @narrative_query.chomp("OR ")
       @rich_text_query = @rich_text_query.chomp("OR ")
       @address_query  = @address_query.chomp("OR ")
+      @documents_query  = @documents_query.chomp("OR ")
 
       if params["search"].present?
         if params["year"] == 'Both'
@@ -60,11 +63,13 @@ module Api
          @people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1920 = Building.joins(people_1920: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_document1920 = Building.joins(people_1920: :documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
          @buildings_people1910 = Building.joins(:people_1910).where(@person_query1910,:search => "%#{params["search"]}%").ids.uniq
          @people_photo1910 = Building.joins(people_1910: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_document1910 = Building.joins(people_1910: :documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
 
          @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -91,12 +96,14 @@ module Api
          @buildings << @people_video1920
          @buildings << @people_audio1920
          @buildings << @people_narrative1920
+         @buildings << @people_document1920
 
          @buildings << @buildings_people1910
          @buildings << @people_photo1910
          @buildings << @people_video1910
          @buildings << @people_audio1910
          @buildings << @people_narrative1910
+         @buildings << @people_document1910
 
          @buildings << @narrative_action_text_story1910
          @buildings << @narrative_action_text_sources1910
@@ -123,6 +130,7 @@ module Api
           @people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
           @people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
           @people_narrative1910 = Building.joins(people_1910: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+          @people_document1910 = Building.joins(people_1910: :documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
 
           @narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
           @narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -143,6 +151,7 @@ module Api
           @buildings << @people_video1910
           @buildings << @people_audio1910
           @buildings << @people_narrative1910
+          @buildings << @people_document1910
 
           @buildings << @narrative_action_text_story1910
           @buildings << @narrative_action_text_sources1910
@@ -166,6 +175,7 @@ module Api
          @people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{params["search"]}%").ids.uniq
          @people_narrative1920 = Building.joins(people_1920: :narratives).where(@narrative_query,:search => "%#{params["search"]}%").ids.uniq
+         @people_document1920 = Building.joins(people_1920: :documents).where(@documents_query,:search => "%#{params["search"]}%").ids.uniq
 
          @narrative_action_text_story1920 = Building.joins(people_1920: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
          @narrative_action_text_sources1920 = Building.joins(people_1920: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{params["search"]}%").ids.uniq
@@ -186,6 +196,7 @@ module Api
           @buildings << @people_video1920
           @buildings << @people_audio1920
           @buildings << @people_narrative1920
+          @buildings << @people_document1920
 
           @buildings << @narrative_action_text_story1920
           @buildings << @narrative_action_text_sources1920

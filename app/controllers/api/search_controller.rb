@@ -267,6 +267,7 @@ module Api
             "coordinates": record.coordinates
           },
           "properties": {
+            "record_type": record.class.name,
             "location_id": record.id,
             "title": record.primary_street_address,
             "building_addresses": record.addresses,
@@ -291,6 +292,7 @@ module Api
         "coordinates": record.coordinates
       },
       "properties": {
+        "record_type": record.class.name,
         "location_id": record.id,
         "title":  record.primary_street_address,
         "building_addresses": record.addresses,
@@ -316,6 +318,7 @@ module Api
         "coordinates": record.coordinates
       },
       "properties": {
+        "record_type": record.class.name,
         "location_id": record.id,
         "title":  record.primary_street_address,
         "building_addresses": record.addresses,

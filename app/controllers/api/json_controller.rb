@@ -116,7 +116,8 @@ module Api
             "address": record.primary_street_address,
             "location": record.coordinates,
             "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"people1920": person_array_1920, "people1910": [],"media": get_media(record)  ],
-            "rich_description": record.rich_text_description
+            "rich_description": record.rich_text_description,
+            "stories": building_narratives
             
           
         }
@@ -130,7 +131,8 @@ module Api
         "address": record.primary_street_address,
         "location": record.coordinates,
         "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": [], "people1910": person_array_1910,"media": get_media(record)  ],
-        "rich_description": record.rich_text_description
+        "rich_description": record.rich_text_description,
+        "stories": building_narratives
         
       
     }
@@ -144,7 +146,8 @@ module Api
         "address": record.primary_street_address,
         "location": record.coordinates,
         "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": person_array_1920, "people1910": person_array_1910,"media": get_media(record)  ],
-        "rich_description": record.rich_text_description
+        "rich_description": record.rich_text_description,
+        "stories": building_narratives
         
       
     }

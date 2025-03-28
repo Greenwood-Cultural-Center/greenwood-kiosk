@@ -116,63 +116,37 @@ module Api
             "address": record.primary_street_address,
             "location": record.coordinates,
             "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"people1920": person_array_1920, "people1910": [],"media": get_media(record)  ],
-            "building_audios": record.audios,
-            "building_narratives": building_narratives,
-            "building_videos": record.videos,
-            "building_photos": building_photos,
-            "rich_description": record.rich_text_description,
+            "rich_description": record.rich_text_description
             
           
         }
      
       elsif year == '1910'
         feature = {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": record.coordinates
-      },
-      "properties": {
-        "location_id": record.id,
-        "title":  record.primary_street_address,
-        "building_addresses": record.addresses,
-        "building_audios": record.audios,
-        "building_narratives": building_narratives,
-        "building_videos": record.videos,
-        "building_photos": building_photos,
-        "description": record.full_street_address,
-        "rich_description": record.rich_text_description,
-        "1910": record.census1910_records,
-        "1920": [],
-        "1910_people": person_array_1910,
-        "1920_people": []
+          
+        "id": record.id,
+        "name": record.name,
+        "description": record.description,
+        "address": record.primary_street_address,
+        "location": record.coordinates,
+        "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": [], "people1910": person_array_1910,"media": get_media(record)  ],
+        "rich_description": record.rich_text_description
         
-      }
-    } 
+      
+    }
 
       elsif year == 'Both'
         feature = {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": record.coordinates
-      },
-      "properties": {
-        "location_id": record.id,
-        "title":  record.primary_street_address,
-        "building_addresses": record.addresses,
-        "building_audios": record.audios,
-        "building_narratives": building_narratives,
-        "building_videos": record.videos,
-        "building_photos": building_photos,
-        "description": record.full_street_address,
-        "rich_description": record.rich_text_description,
-        "1910": record.census1910_records,
-        "1920": record.census1920_records,
-        "1910_people": person_array_1910,
-        "1920_people": person_array_1920
+          
+        "id": record.id,
+        "name": record.name,
+        "description": record.description,
+        "address": record.primary_street_address,
+        "location": record.coordinates,
+        "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": person_array_1920, "people1910": person_array_1910,"media": get_media(record)  ],
+        "rich_description": record.rich_text_description
         
-      }
+      
     }
       end 
       

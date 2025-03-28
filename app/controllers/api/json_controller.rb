@@ -56,6 +56,19 @@ module Api
     end
 
     def make_feature(record,year)
+
+      def get_media(record)
+        media_array = []
+
+        record.photos.each {|photo| media_array.append({"type": "photo","id": photo.id})}
+        record.audios.each {|audio| media_array.append({"type": "audio","id": audio.id})}
+        record.videos.each {|video| media_array.append({"type": "video","id": video.id})}
+        record.narratives.each {|narrative| media_array.append({"type": "narrative","id": narrative.id})}
+
+        return media_array
+
+
+      end
       def get_person(person)
         person_narratives = []
         person.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
@@ -90,26 +103,23 @@ module Api
        
        
             feature = {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": record.coordinates
-          },
-          "properties": {
-            "location_id": record.id,
-            "title": record.primary_street_address,
-            "building_addresses": record.addresses,
+          
+            "id": record.id,
+            "name": record.name,
+            "description": record.description,
+            "address": record.primary_street_address,
+            "location": record.coordinates,
+            "properties": ["media": get_media(record) ],
             "building_audios": record.audios,
             "building_narratives": building_narratives,
             "building_videos": record.videos,
             "building_photos": building_photos,
-            "description": record.full_street_address,
             "rich_description": record.rich_text_description,
             "1910": [],
             "1920": record.census1920_records,
             "1910_people": [],
             "1920_people": person_array_1920
-          }
+          
         }
      
       elsif year == '1910'
@@ -165,12 +175,12 @@ module Api
       
       
      
-      if feature[:properties][:"1920"].empty? && year =='1920'
+      if feature[:"1920"].empty? && year =='1920'
         
         return 
      end
 
-     if feature[:properties][:"1910"].empty? && year =='1910'
+     if feature[:"1910"].empty? && year =='1910'
       
       return 
    end

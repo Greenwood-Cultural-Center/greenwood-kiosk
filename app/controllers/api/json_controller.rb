@@ -69,6 +69,12 @@ module Api
 
 
       end
+
+      def get_censusrecord(census_array)
+        json_array = []
+        census_array.each {|census| json_array.append(census.id)}
+        return json_array
+      end
       def get_person(person)
         person_narratives = []
         person.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
@@ -109,16 +115,13 @@ module Api
             "description": record.description,
             "address": record.primary_street_address,
             "location": record.coordinates,
-            "properties": ["media": get_media(record) ],
+            "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"people1920": person_array_1920, "people1910": [],"media": get_media(record)  ],
             "building_audios": record.audios,
             "building_narratives": building_narratives,
             "building_videos": record.videos,
             "building_photos": building_photos,
             "rich_description": record.rich_text_description,
-            "1910": [],
-            "1920": record.census1920_records,
-            "1910_people": [],
-            "1920_people": person_array_1920
+            
           
         }
      
@@ -175,12 +178,12 @@ module Api
       
       
      
-      if feature[:"1920"].empty? && year =='1920'
+      if record.census1920_records.empty? && year =='1920'
         
         return 
      end
 
-     if feature[:"1910"].empty? && year =='1910'
+     if record.census1910_records.empty? && year =='1910'
       
       return 
    end

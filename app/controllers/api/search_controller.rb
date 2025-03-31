@@ -63,13 +63,13 @@ module Api
         people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_narrative1920 = Building.joins(people_1920: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq
-        people_document1920 = Building.joins(people_1920: :documents).where(@documents_query,:search => "%#{target}%").ids.uniq
+        people_document1920 = Building.joins(people_1920: :documents).where(documents_query,:search => "%#{target}%").ids.uniq
         buildings_people1910 = Building.joins(:people_1910).where(person_query1910,:search => "%#{target}%").ids.uniq
         people_photo1910 = Building.joins(people_1910: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_narrative1910 = Building.joins(people_1910: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq
-        people_document1910 = Building.joins(people_1910: :documents).where(@documents_query,:search => "%#{target}%").ids.uniq
+        people_document1910 = Building.joins(people_1910: :documents).where(documents_query,:search => "%#{target}%").ids.uniq
 
         narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
         narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
@@ -130,7 +130,7 @@ module Api
         people_video1910 = Building.joins(people_1910: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_audio1910 = Building.joins(people_1910: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_narrative1910 = Building.joins(people_1910: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq
-        people_document1910 = Building.joins(people_1910: :documents).where(@documents_query,:search => "%#{target}%").ids.uniq
+        people_document1910 = Building.joins(people_1910: :documents).where(documents_query,:search => "%#{target}%").ids.uniq
 
         narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
         narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
@@ -174,7 +174,7 @@ module Api
         people_video1920 = Building.joins(people_1920: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_audio1920 = Building.joins(people_1920: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{target}%").ids.uniq
         people_narrative1920 = Building.joins(people_1920: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq
-        people_document1920 = Building.joins(people_1920: :documents).where(@documents_query,:search => "%#{target}%").ids.uniq
+        people_document1920 = Building.joins(people_1920: :documents).where(documents_query,:search => "%#{target}%").ids.uniq
 
         buildings << buildings2
         buildings << buildings_people1920

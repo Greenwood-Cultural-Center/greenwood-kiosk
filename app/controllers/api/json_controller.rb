@@ -4,6 +4,232 @@ module Api
    #http://127.0.0.1:3000/api/search?search=#{params[:search]}&year=#{params[:year]} the year parameter should only be 1920,1910 or the word Both
    @@search_controller = SearchController.new
  
+  def search_people(search,year)
+    @census_query = ''
+      @building_query = ''
+      @census1910_query=''
+      @person_query = ''
+      @audio_query = ''
+      @video_query = ''
+      @photo_query = ''
+      @narrative_query = ''
+      @rich_text_query = ''
+      @address_query = ''
+
+      @census_query = search_query('Census1920Record',@census_query)
+      @census1910_query = search_query('Census1910Record',@census1910_query)
+      @building_query = search_query('Building',@building_query)
+      @person_query = search_query('Person',@person_query)
+      @audio_query = search_query('Audio',@audio_query)
+      @video_query = search_query('Video',@video_query)
+      @photo_query = search_query('Photograph',@photo_query)
+      @narrative_query = search_query('Narrative',@narrative_query)
+      @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
+      @address_query = search_query('Address',@address_query)
+     
+      @building_query = @building_query.chomp("OR ")
+      @census_query = @census_query.chomp("OR ")
+      @census1910_query = @census1910_query.chomp("OR ")
+      @person_query = @person_query.chomp("OR ")
+      @audio_query = @audio_query.chomp("OR ")
+      @video_query = @video_query.chomp("OR ")
+      @photo_query = @photo_query.chomp("OR ")
+      @narrative_query = @narrative_query.chomp("OR ")
+      @rich_text_query = @rich_text_query.chomp("OR ")
+      @address_query  = @address_query.chomp("OR ")
+
+
+      if search.present?
+        if year == 'Both'
+          #binding.pry
+         @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
+         @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_audio = Person.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+         @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+        # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+
+
+
+         @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
+         @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
+         
+
+          binding.pry
+         @people_buildings = Person.joins(:buildings_1910).where(@person_query,:search => "%#{search}%").ids.uniq
+         @people_buildings = Person.joins(:buildings_1920).where(@person_query,:search => "%#{search}%").ids.uniq
+         
+         @building_photos = Person.joins(buildings: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_videos = Person.joins(buildings: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_audios = Person.joins(buildings: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_narratives = Person.joins(buildings: :narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+
+
+
+
+         @narrative_action_text_story_building = Person.joins(buildings: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         @narrative_action_text_sources_building = Person.joins(buildings: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+
+         
+
+
+
+          
+          @people << @people_photo
+         @people << @people_video
+         @people << @people_audio
+         @people << @people_narrative
+         @people <<  @people_action_text_sources
+         @people <<  @people_action_text_story
+        # @people << @people_action_text_description
+        # @people << @people_address
+
+         @people << @people_census1920
+         @people << @people_census1910
+         @people << @people_buildings
+         @people << @building_photos
+         @people << @building_videos
+         @people << @building_audios
+         @people << @building_narratives
+
+         
+
+         @people << @narrative_action_text_story_building
+         @people << @narrative_action_text_sources_building
+
+        
+         @people = @people.flatten.uniq
+         @people = Person.where(id: @people)
+          
+        elsif year == '1910'
+          @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
+          @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @people_audio = Person.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+          @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+          @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+          #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+ 
+ 
+ 
+          
+          @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
+          
+ 
+ 
+          @people_buildings = Person.joins(:buildings).where(@person_query,:search => "%#{search}%").ids.uniq
+          @building_photos = Person.joins(buildings: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @building_videos = Person.joins(buildings: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @building_audios = Person.joins(buildings: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+          @building_narratives = Person.joins(buildings: :narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+ 
+ 
+ 
+ 
+          @narrative_action_text_story_building = Person.joins(buildings: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+          @narrative_action_text_sources_building = Person.joins(buildings: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+ 
+          
+ 
+ 
+ 
+           
+           @people << @people_photo
+          @people << @people_video
+          @people << @people_audio
+          @people << @people_narrative
+          @people <<  @people_action_text_sources
+          @people <<  @people_action_text_story
+         # @people << @people_action_text_description
+         # @people << @people_address
+ 
+          
+          @people << @people_census1910
+          @people << @people_buildings
+          @people << @building_photos
+          @people << @building_videos
+          @people << @building_audios
+          @people << @building_narratives
+ 
+          
+ 
+          @people << @narrative_action_text_story_building
+          @people << @narrative_action_text_sources_building
+ 
+         
+          @people = @people.flatten.uniq
+          @people = Person.where(id: @people)
+        elsif year == '1920'
+          @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
+         @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_audio = Person.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+         @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+        # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+
+
+
+         @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
+         
+         
+
+
+         @people_buildings = Person.joins(:buildings).where(@person_query,:search => "%#{search}%").ids.uniq
+         @building_photos = Person.joins(buildings: :photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_videos = Person.joins(buildings: :videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_audios = Person.joins(buildings: :audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
+         @building_narratives = Person.joins(buildings: :narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
+
+
+
+
+         @narrative_action_text_story_building = Person.joins(buildings: [{narratives: :rich_text_story}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+         @narrative_action_text_sources_building = Person.joins(buildings: [{narratives: :rich_text_sources}]).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+
+         
+
+
+
+          
+          @people << @people_photo
+         @people << @people_video
+         @people << @people_audio
+         @people << @people_narrative
+         @people <<  @people_action_text_sources
+         @people <<  @people_action_text_story
+        # @people << @people_action_text_description
+        # @people << @people_address
+
+         @people << @people_census1920
+         @people << @people_buildings
+         @people << @building_photos
+         @people << @building_videos
+         @people << @building_audios
+         @people << @building_narratives
+
+         
+
+         @people << @narrative_action_text_story_building
+         @people << @narrative_action_text_sources_building
+
+        
+         @people = @people.flatten.uniq
+         @people = Person.where(id: @people)
+        end
+      else
+        @buildings = Building.all
+      end
+
+
+  end
    def json
       
     

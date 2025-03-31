@@ -262,10 +262,7 @@ module Api
             "id": record.id,
             "name": record.name,
             "description": record.description,
-            "address": record.primary_street_address,
-            "location": record.coordinates,
             "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"buildings": record.buildings,"media": get_media(record)  ],
-            "rich_description": record.rich_text_description,
             "stories": person_narratives
             
           
@@ -277,10 +274,7 @@ module Api
         "id": record.id,
         "name": record.name,
         "description": record.description,
-        "address": record.primary_street_address,
-        "location": record.coordinates,
         "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-        "rich_description": record.rich_text_description,
         "stories": person_narratives
         
       
@@ -292,11 +286,8 @@ module Api
         "id": record.id,
         "name": record.name,
         "description": record.description,
-        "address": record.primary_street_address,
-        "location": record.coordinates,
         "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-        "rich_description": record.rich_text_description,
-        "stories": building_narratives
+        "stories": person_narratives
         
       
     }

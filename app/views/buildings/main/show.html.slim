@@ -138,10 +138,10 @@
         .card-body
           p.lead No Documents yet for this building.
 
-    - if documents.present?
-      .list-group
-        - documents.each do |document|
-          = render 'documents/document', document:
+      - if documents.present?
+        .list-group
+          - documents.each do |document|
+            = render 'documents/document', document:
 
     - CensusYears.each do |year|
       - families = @building.public_send("families_in_#{year}")

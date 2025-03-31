@@ -162,10 +162,10 @@
     .card-body
       p.lead No Documents yet for this Person.
 
-- if documents.present?
-  .list-group
-    - documents.each do |document|
-      = render 'documents/document', document:
+  - if documents.present?
+    .list-group
+      - documents.each do |document|
+        = render 'documents/document', document:
 
 - if @person.notes? && can?(:update, @person)
   .card.mb-3

@@ -40,7 +40,7 @@ module Api
     narrative_query  = narrative_query.chomp("OR ")
     rich_text_query  = rich_text_query.chomp("OR ")
     address_query    = address_query.chomp("OR ")
-    documents_query  = @documents_query.chomp("OR ")
+    documents_query  = documents_query.chomp("OR ")
 
     if target.present?
       if target_year == 'Both'

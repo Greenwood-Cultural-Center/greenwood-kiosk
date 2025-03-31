@@ -11,7 +11,7 @@ module Api
       @buildings =  @@search_controller.search_buildings(params["search"],params["year"])
       @ready_buildings =[]
       
-      @buildings.each{|building|  @ready_buildings.append(make_feature(building,params["year"])) } 
+      @buildings.each{|building|  @ready_buildings.append(make_building(building,params["year"])) } 
       @ready_buildings = @ready_buildings.compact
       @finished_json = build_json
       response.set_header('Access-Control-Allow-Origin', '*')
@@ -55,7 +55,7 @@ module Api
       
     end
 
-    def make_feature(record,year)
+    def make_building(record,year)
 
       def get_media(record)
         media_array = []
@@ -167,20 +167,6 @@ module Api
       
       return feature
     end
-
-    private def make_building(record,year)
-      
-        #feature = @@search_controller.make_feature(record,year)
-       
-      
-      
-     
-      
-      
-      #return feature
-    end
-
     
-
   end
 end

@@ -49,6 +49,7 @@ class DocumentsController < ApplicationController
   end
 
   def create
+    binding.pry
     @document = Document.new resource_params
     authorize! :create, @document
     

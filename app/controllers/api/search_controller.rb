@@ -247,8 +247,7 @@ module Api
           'audios': person.audios,
           'narratives': person_narratives,
           'videos': person.videos,
-          'photos': person_photos,
-          'documents': person.documents
+          'photos': person_photos
         }
       end
       person_array_1910 =[]

@@ -14,6 +14,13 @@ module Api
         
         @people.each{|person|  @ready_people.append(make_person(person,params["year"])) } 
         @ready_people = @ready_people.compact
+
+        @documents =  search_documents(params["search"])
+        @ready_documents = []
+
+        @documents.each{|document| @ready_documents.append(make_document(document))}
+        @ready_documents = @ready_documents.compact
+
         @finished_json = build_json
         response.set_header('Access-Control-Allow-Origin', '*')
         render json: @finished_json
@@ -38,11 +45,13 @@ module Api
         [
           {"buildings": @ready_buildings},
           {"people": @ready_people},
+          {"documents": @ready_documents},
         ],
         "count":
         { 
           "buildings": @ready_buildings.count,
           "people": @ready_people.count,
+          "documents": @ready_documents.count,
         }
       }
     end
@@ -190,6 +199,28 @@ module Api
       end
       return feature
     end
+
+    def search_documents(search)
+      documents_query  = ''
+      documents_query  = search_query('Document',documents_query)
+      documents_query  = documents_query.chomp('OR ')
+      if search.present?
+       documents = Document.where(documents_query,:search => "%#{target}%").ids.uniq
+      else
+        documents = nil
+      end
+      documents
+
+            
+    end
+
+    def make_document(record)
+            
+    end
+
+
+
+
     def search_people(search,year)
       @census_query = ''
         @building_query = ''

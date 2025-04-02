@@ -37,12 +37,12 @@ module Api
         "results":
         [
           {"buildings": @ready_buildings},
-          {"people": @ready_people}
+          {"people": @ready_people},
         ],
         "count":
         { 
           "buildings": @ready_buildings.count,
-          "people": @ready_people.count
+          "people": @ready_people.count,
         }
       }
     end

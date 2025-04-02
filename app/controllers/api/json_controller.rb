@@ -18,7 +18,7 @@ module Api
         @documents =  search_documents(params["search"])
         @ready_documents = []
 
-        @documents.each{|document| @ready_documents.append(make_document(document))}
+        @documents.each{|document| @ready_documents.append(make_document(document,params["year"]))}
         @ready_documents = @ready_documents.compact
 
         @finished_json = build_json
@@ -205,7 +205,7 @@ module Api
       documents_query  = search_query('Document',documents_query)
       documents_query  = documents_query.chomp('OR ')
       if search.present?
-       documents = Document.where(documents_query,:search => "%#{target}%").ids.uniq
+       documents = Document.where(documents_query,:search => "%#{search}%").uniq
       else
         documents = nil
       end
@@ -214,7 +214,7 @@ module Api
             
     end
 
-    def make_document(record)
+    def make_document(record,year)
       if record.nil? == false
         if record.document_category.name == "census record"
           if year == "1910" && record.people.where.associated(:census1910_records).nil? == false

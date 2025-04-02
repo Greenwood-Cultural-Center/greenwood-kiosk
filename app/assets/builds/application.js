@@ -52406,6 +52406,105 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     });
   };
 
+  // app/javascript/controllers/document_controller.js
+  var document_controller_default = class extends Controller {
+    connect() {
+      this.paramKey = "document";
+      window.scrollTo(0, 0);
+      $("button.btn-prev").on("click", (e2) => {
+        this.prev(e2.target);
+      });
+      $("button.btn-next").on("click", (e2) => {
+        this.next(e2.target);
+      });
+      $("#document_url").on("change", function(e2) {
+        const value = e2.target.value;
+      });
+      this.initBuildings();
+      this.initPeople();
+    }
+    initPeople() {
+      $("#person-question .btn-primary").on("click", function() {
+        $("#person-question").fadeOut();
+        $("#person-fields").fadeIn();
+      });
+      let autocompleteTimeout;
+      $("#person-autocomplete").on("keyup", (e2) => {
+        if (e2.keyCode === 13) {
+          e2.stopPropagation();
+        }
+        const input = e2.target;
+        const value = input.value;
+        if (value.length > 1) {
+          if (autocompleteTimeout) {
+            window.clearTimeout(autocompleteTimeout);
+          }
+          autocompleteTimeout = window.setTimeout(() => {
+            $.getJSON("/people/autocomplete", { term: value }, (json) => {
+              const people = [];
+              json.forEach((person) => {
+                people.push(`<div class="list-group-item list-group-item-action" data-person=${person.id}>${person.name} (${person.id}) - ${person.years}</div>`);
+              });
+              $("#person-results").html(people).show();
+              $("#person-results .list-group-item").on("click", (e3) => {
+                const id = e3.target.dataset.person;
+                const name = e3.target.innerHTML;
+                this.addPerson(id, name);
+                input.value = null;
+                $("#person-results").html("");
+              });
+            });
+          }, 500);
+        }
+      });
+    }
+    initBuildings() {
+      $("#building-question .btn-primary").on("click", function() {
+        $("#building-question").fadeOut();
+        $("#building-fields").fadeIn();
+      });
+      $("#building-autocomplete").on("keyup", (e2) => {
+        if (e2.keyCode === 13) {
+          e2.stopPropagation();
+        }
+        const input = e2.target;
+        const value = input.value;
+        if (value.length > 1) {
+          $.getJSON("/buildings/autocomplete", { term: value }, (json) => {
+            const buildings3 = [];
+            json.forEach((building) => {
+              buildings3.push(`<div class="list-group-item list-group-item-action" data-building=${building.id} data-lat="${building.lat}" data-lon="${building.lon}">${building.address}</div>`);
+            });
+            $("#building-results").html(buildings3).show();
+            $("#building-results .list-group-item").on("click", (e3) => {
+              const id = e3.target.dataset.building;
+              const lat = e3.target.dataset.lat;
+              const lon = e3.target.dataset.lon;
+              const address2 = e3.target.innerHTML;
+              this.addBuilding(id, address2, lat, lon);
+              input.value = null;
+              $("#building-results").html("");
+            });
+          });
+        }
+      });
+    }
+    addBuilding(id, address2, lat, lon) {
+      const formId = `documents_building_ids_${id}`;
+      $(`#${formId}`).closest(".form-check").remove();
+      const html = `<div class="form-check"><input type="checkbox" class="form-check-input" name="${this.paramKey}[building_ids][]" id="${formId}" value="${id}" checked /><label class="form-check-label" for="${formId}">${address2}</label></div>`;
+      $(`.${this.paramKey}_building_ids`).append(html);
+      if ($(`.${this.paramKey}_building_ids input:checked`).length === 1) {
+      }
+    }
+    addPerson(id, name) {
+      const formId = `${this.paramKey}_person_ids_${id}`;
+      $(`#person-fields input[value=${id}]`).closest(".form-check").remove();
+      const html = `<div class="form-check"><input type="checkbox" class="form-check-input" name="${this.paramKey}[person_ids][]" id="${formId}" value="${id}" checked /><label class="form-check-label" for="${formId}">${name}</label></div>`;
+      $(`.${this.paramKey}_person_ids`).append(html);
+    }
+  };
+
   // app/javascript/controllers/save_search_controller.js
   var save_search_controller_default = class extends Controller {
     connect() {
@@ -52500,6 +52599,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     { identifier: "census-autocomplete", controllerConstructor: census_autocomplete_controller_default },
     { identifier: "load-saved-search", controllerConstructor: load_saved_search_controller_default },
     { identifier: "photo-wizard", controllerConstructor: photo_wizard_controller_default },
+    { identifier: "document", controllerConstructor: document_controller_default },
     { identifier: "save-search", controllerConstructor: save_search_controller_default },
     { identifier: "saved-searches", controllerConstructor: saved_searches_controller_default }
   ];

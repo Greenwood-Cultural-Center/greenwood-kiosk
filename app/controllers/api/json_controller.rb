@@ -40,6 +40,13 @@ module Api
     end
 
     private def build_json
+      
+      census_records = 0
+      @ready_documents.each  do |doc|
+       if doc[:category] == "census record"
+           census_records += 1           
+       end       
+       end
       {
         "results":
         [
@@ -52,6 +59,7 @@ module Api
           "buildings": @ready_buildings.count,
           "people": @ready_people.count,
           "documents": @ready_documents.count,
+          "census_records": census_records,
         }
       }
     end
@@ -216,6 +224,10 @@ module Api
 
     def make_document(record,year)
       if record.nil? == false
+        url = ""
+        if record.file_attachment.nil? == false
+             url =  rails_blob_url(record.file_attachment, only_path: true)      
+        end
         if record.document_category.name == "census record"
           if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
             feature = {
@@ -223,8 +235,9 @@ module Api
               "category": record.document_category.name,
               "name": record.name,
               "description": record.description,
+              "URL": url,
               "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
-              "URL": '',
+              
           }
           return feature
             
@@ -236,8 +249,9 @@ module Api
               "category": record.document_category.name,
               "name": record.name,
               "description": record.description,
+              "URL": url,
               "properties": ["people": record.people.where.associated(:census1920_records).ids.uniq ],
-              "URL": '',
+              
           }
           return feature
 
@@ -247,8 +261,9 @@ module Api
               "category": record.document_category.name,
               "name": record.name,
               "description": record.description,
+              "URL": url,
               "properties": ["people": record.people.ids.uniq ],
-              "URL": '',
+              
           }
           return feature
 
@@ -264,8 +279,9 @@ module Api
             "category": record.document_category.name,
             "name": record.name,
             "description": record.description,
+            "URL": url,
             "properties": [],
-            "URL": '',
+            
         }
         return feature
         end

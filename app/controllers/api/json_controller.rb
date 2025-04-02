@@ -215,6 +215,63 @@ module Api
     end
 
     def make_document(record)
+      if record.nil? == false
+        if record.document_category.name == "census record"
+          if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
+              "URL": '',
+          }
+          return feature
+            
+
+                        
+          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "properties": ["people": record.people.where.associated(:census1920_records).ids.uniq ],
+              "URL": '',
+          }
+          return feature
+
+          elsif year == "Both"
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "properties": ["people": record.people.ids.uniq ],
+              "URL": '',
+          }
+          return feature
+
+          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+            return
+          elsif year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+            return
+          end
+      
+        else
+          feature = {
+            "id": record.id,
+            "category": record.document_category.name,
+            "name": record.name,
+            "description": record.description,
+            "properties": [],
+            "URL": '',
+        }
+        return feature
+        end
+      else
+        return
+      end
             
     end
 

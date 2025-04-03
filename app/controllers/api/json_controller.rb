@@ -251,6 +251,10 @@ module Api
         if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
           feature = {
             "id": record.id,
+            "type": "audio",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
             
         }
@@ -259,6 +263,10 @@ module Api
         elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
           feature = {
             "id": record.id,
+            "type": "audio",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
             
         }
@@ -266,6 +274,10 @@ module Api
         elsif year == "Both"
           feature = {
             "id": record.id,
+            "type": "audio",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
             
         }

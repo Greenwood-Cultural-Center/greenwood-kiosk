@@ -14,6 +14,12 @@ module Api
         
         @people.each{|person|  @ready_people.append(make_person(person,params["year"])) } 
         @ready_people = @ready_people.compact
+
+        @narratives =  search_narratives(params["search"],params["year"])
+        @ready_narratives =[]
+        
+        @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,params["year"])) } 
+        @ready_narratives = @ready_narratives.compact
         @finished_json = build_json
         response.set_header('Access-Control-Allow-Origin', '*')
         render json: @finished_json
@@ -38,11 +44,13 @@ module Api
         [
           {"buildings": @ready_buildings},
           {"people": @ready_people},
+          {"narratives": @ready_narratives},
         ],
         "count":
         { 
           "buildings": @ready_buildings.count,
           "people": @ready_people.count,
+          "narratives": @ready_narratives.count,
         }
       }
     end
@@ -133,6 +141,57 @@ module Api
    end
       return feature
     end
+
+
+    def search_narratives(search,year)
+      narratives_query  = ''
+      rich_text_query = ''
+      narratives_query  = search_query('Narrative',narratives_query)
+      rich_text_query = search_query('ActionText::RichText',rich_text_query)
+      rich_text_query = rich_text_query.chomp("OR ")
+      narratives_query  = narratives_query.chomp("OR ")
+      if search.present?
+       narratives = Narrative.where(narratives_query,:search => "%#{search}%").ids.uniq
+       narratives_stories = Narrative.joins(:rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+       narratives_sources = Narrative.joins(:rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
+       narratives << narratives_stories
+       narratives << narratives_sources
+       narratives = narratives.flatten.uniq
+       narratives = Narrative.where(id: narratives)
+       
+      else
+        narratives = nil
+      end
+      narratives
+
+            
+    end
+
+    def make_narrative(record,year)
+      if record.nil? == false
+        
+        
+          
+        
+          feature = {
+            "id": record.id,
+            "story": record.story,
+            "sources": record.sources,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
+            
+        }
+        return feature
+        
+      else
+        return
+      end
+            
+    end
+
+
+
+
+    
     def make_person(record,year)
 
       def get_media(record)

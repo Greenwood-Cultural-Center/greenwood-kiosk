@@ -200,7 +200,7 @@ module Api
           return feature
         elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
           return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
           return
         end
         

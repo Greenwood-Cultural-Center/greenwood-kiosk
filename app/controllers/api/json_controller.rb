@@ -15,7 +15,7 @@ module Api
         @people.each{|person|  @ready_people.append(make_person(person,params["year"])) } 
         @ready_people = @ready_people.compact
 
-        @narratives =  search_narratives(params["search"],params["year"])
+        @narratives =  search_narratives(params["search"])
         @ready_narratives =[]
         
         @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,params["year"])) } 
@@ -143,7 +143,7 @@ module Api
     end
 
 
-    def search_narratives(search,year)
+    def search_narratives(search)
       narratives_query  = ''
       rich_text_query = ''
       narratives_query  = search_query('Narrative',narratives_query)
@@ -170,9 +170,26 @@ module Api
     def make_narrative(record,year)
       if record.nil? == false
         
-        
-          
-        
+        if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+          feature = {
+            "id": record.id,
+            "story": record.story,
+            "sources": record.sources,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            
+        }
+
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+          feature = {
+            "id": record.id,
+            "story": record.story,
+            "sources": record.sources,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
+            
+        }
+          return feature
+        elsif year == "Both"
           feature = {
             "id": record.id,
             "story": record.story,
@@ -180,7 +197,12 @@ module Api
             "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
             
         }
-        return feature
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+          return
+        elsif year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+          return
+        end
         
       else
         return

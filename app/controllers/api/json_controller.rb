@@ -160,6 +160,63 @@ module Api
     end
 
 
+    def search_photo(search)
+      photos_query  = ''
+      
+      photos_query  = search_query('Photograph',photos_query)
+      photos_query  = photos_query.chomp("OR ")
+      if search.present?
+       photos = Photograph.where(photos_query,:search => "%#{search}%").ids.uniq
+       photos = photos.flatten.uniq
+       photos = Photograph.where(id: photos)
+       
+      else
+        photos = nil
+      end
+      photos
+
+            
+    end
+
+    def make_photo(record,year)
+      if record.nil? == false
+        
+        if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            
+        }
+
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
+            
+        }
+          return feature
+        elsif year == "Both"
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
+            
+        }
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
+      else
+        return
+      end
+            
+    end
+
+
+
     def search_narratives(search)
       narratives_query  = ''
       rich_text_query = ''

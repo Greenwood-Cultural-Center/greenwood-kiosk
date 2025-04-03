@@ -27,6 +27,18 @@ module Api
         
         @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,params["year"])) } 
         @ready_narratives = @ready_narratives.compact
+
+
+        @photos =  search_photos(params["search"])
+
+        @ready_media = []
+        @ready_photos =[]
+        
+        @photos.each{|photo|  @ready_photos.append(make_photo(photo,params["year"])) } 
+        @ready_photos = @ready_photos.compact
+
+        @ready_media << @ready_photos
+
         @finished_json = build_json
         response.set_header('Access-Control-Allow-Origin', '*')
         render json: @finished_json
@@ -60,6 +72,7 @@ module Api
           {"people": @ready_people},
           {"documents": @ready_documents},
           {"narratives": @ready_narratives},
+          {"media": @ready_media},
         ],
         "count":
         { 
@@ -68,6 +81,7 @@ module Api
           "documents": @ready_documents.count,
           "census_records": census_records,
           "narratives": @ready_narratives.count,
+          "media": @ready_media.count,
         }
       }
     end
@@ -160,7 +174,7 @@ module Api
     end
 
 
-    def search_photo(search)
+    def search_photos(search)
       photos_query  = ''
       
       photos_query  = search_query('Photograph',photos_query)

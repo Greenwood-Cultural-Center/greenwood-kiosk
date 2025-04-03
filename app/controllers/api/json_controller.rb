@@ -180,18 +180,31 @@ module Api
 
     def make_photo(record,year)
       if record.nil? == false
-        
-        if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+
+        url = ""
+        if record.file_attachment.nil? == false
+             url =  rails_blob_url(record.file_attachment, only_path: true)      
+        end
+
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
           feature = {
             "id": record.id,
+            "type": "photo",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
             
         }
 
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
           feature = {
             "id": record.id,
+            "type": "photo",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
             
         }
@@ -199,6 +212,10 @@ module Api
         elsif year == "Both"
           feature = {
             "id": record.id,
+            "type": "photo",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": url,
             "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
             
         }

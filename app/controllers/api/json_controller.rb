@@ -228,7 +228,59 @@ module Api
     end
 
 
+    def search_audios(search)
+      audios_query  = ''
+      audios_query  = search_query('Audio',audios_query)
+      audios_query  = audios_query.chomp("OR ")
+      if search.present?
+       audios = Audio.where(audios_query,:search => "%#{search}%").ids.uniq
+       audios = audios.flatten.uniq
+       audios = Audio.where(id: audios)
+       
+      else
+        audios = nil
+      end
+      audios
 
+            
+    end
+
+    def make_audio(record,year)
+      if record.nil? == false
+        
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            
+        }
+
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
+            
+        }
+          return feature
+        elsif year == "Both"
+          feature = {
+            "id": record.id,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
+            
+        }
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
+      else
+        return
+      end
+            
+    end
 
     
     def make_person(record,year)

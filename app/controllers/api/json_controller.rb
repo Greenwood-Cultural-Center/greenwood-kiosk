@@ -15,6 +15,13 @@ module Api
         @people.each{|person|  @ready_people.append(make_person(person,params["year"])) } 
         @ready_people = @ready_people.compact
 
+        @documents =  search_documents(params["search"])
+        @ready_documents = []
+
+        @documents.each{|document| @ready_documents.append(make_document(document,params["year"]))}
+        @ready_documents = @ready_documents.compact
+
+
         @narratives =  search_narratives(params["search"])
         @ready_narratives =[]
         
@@ -39,17 +46,27 @@ module Api
     end
 
     private def build_json
+      
+      census_records = 0
+      @ready_documents.each  do |doc|
+       if doc[:category] == "census record"
+           census_records += 1           
+       end       
+       end
       {
         "results":
         [
           {"buildings": @ready_buildings},
           {"people": @ready_people},
+          {"documents": @ready_documents},
           {"narratives": @ready_narratives},
         ],
         "count":
         { 
           "buildings": @ready_buildings.count,
           "people": @ready_people.count,
+          "documents": @ready_documents.count,
+          "census_records": census_records,
           "narratives": @ready_narratives.count,
         }
       }
@@ -271,6 +288,93 @@ module Api
       end
       return feature
     end
+
+    def search_documents(search)
+      documents_query  = ''
+      documents_query  = search_query('Document',documents_query)
+      documents_query  = documents_query.chomp('OR ')
+      if search.present?
+       documents = Document.where(documents_query,:search => "%#{search}%").uniq
+      else
+        documents = nil
+      end
+      documents
+
+            
+    end
+
+    def make_document(record,year)
+      if record.nil? == false
+        url = ""
+        if record.file_attachment.nil? == false
+             url =  rails_blob_url(record.file_attachment, only_path: true)      
+        end
+        if record.document_category.name == "census record"
+          if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "URL": url,
+              "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
+              
+          }
+          return feature
+            
+
+                        
+          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "URL": url,
+              "properties": ["people": record.people.where.associated(:census1920_records).ids.uniq ],
+              
+          }
+          return feature
+
+          elsif year == "Both"
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "URL": url,
+              "properties": ["people": record.people.ids.uniq ],
+              
+          }
+          return feature
+
+          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+            return
+          elsif year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+            return
+          end
+      
+        else
+          feature = {
+            "id": record.id,
+            "category": record.document_category.name,
+            "name": record.name,
+            "description": record.description,
+            "URL": url,
+            "properties": [],
+            
+        }
+        return feature
+        end
+      else
+        return
+      end
+            
+    end
+
+
+
+
     def search_people(search,year)
       @census_query = ''
         @building_query = ''
@@ -282,6 +386,8 @@ module Api
         @narrative_query = ''
         @rich_text_query = ''
         @address_query = ''
+        @documents_query  = ''
+
         @census_query = search_query('Census1920Record',@census_query)
         @census1910_query = search_query('Census1910Record',@census1910_query)
         @building_query = search_query('Building',@building_query)
@@ -292,6 +398,7 @@ module Api
         @narrative_query = search_query('Narrative',@narrative_query)
         @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
         @address_query = search_query('Address',@address_query)
+        @documents_query  = search_query('Document',@documents_query)
         @building_query = @building_query.chomp("OR ")
         @census_query = @census_query.chomp("OR ")
         @census1910_query = @census1910_query.chomp("OR ")
@@ -302,6 +409,8 @@ module Api
         @narrative_query = @narrative_query.chomp("OR ")
         @rich_text_query = @rich_text_query.chomp("OR ")
         @address_query  = @address_query.chomp("OR ")
+        @documents_query  = @documents_query.chomp("OR ")
+        
 
         if search.present?
           if year == 'Both'
@@ -314,6 +423,7 @@ module Api
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+          @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
           @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
           @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
@@ -328,6 +438,7 @@ module Api
           @people <<  @people_action_text_story
           # @people << @people_action_text_description
           # @people << @people_address
+          @people << @people_document
 
           @people << @people_census1920
           @people << @people_census1910
@@ -347,6 +458,7 @@ module Api
             @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
             #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+            @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
   
             @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
             @people_buildings1910 = Person.joins(:buildings_1910).where(@person_query,:search => "%#{search}%").ids.uniq
@@ -359,6 +471,7 @@ module Api
             @people <<  @people_action_text_story
           # @people << @people_action_text_description
           # @people << @people_address
+            @people << @people_document
   
             @people << @people_census1910
             @people << @people_buildings1910
@@ -375,6 +488,7 @@ module Api
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           #@people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
+          @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
           @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
           @people_buildings1920 = Person.joins(:buildings_1920).where(@person_query,:search => "%#{search}%").ids.uniq
@@ -387,6 +501,7 @@ module Api
           @people <<  @people_action_text_story
           # @people << @people_action_text_description
           # @people << @people_address
+          @people << @people_document
 
           @people << @people_census1920
           @people << @people_buildings1920

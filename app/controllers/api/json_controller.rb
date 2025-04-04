@@ -35,10 +35,10 @@ module Api
         @ready_photos =[]
         
         @photos.each{|photo|  @ready_photos.append(make_photo(photo,params["year"])) } 
-        @ready_photos = @ready_photos.compact
+        @ready_photos = @ready_photos.compact_blank
 
         @ready_media << @ready_photos
-
+        @ready_media = @ready_media.compact_blank
         @finished_json = build_json
         response.set_header('Access-Control-Allow-Origin', '*')
         render json: @finished_json
@@ -59,6 +59,7 @@ module Api
 
     private def build_json
       
+      media_count = @ready_photos.count #add other media arrays to it
       census_records = 0
       @ready_documents.each  do |doc|
        if doc[:category] == "census record"
@@ -81,7 +82,7 @@ module Api
           "documents": @ready_documents.count,
           "census_records": census_records,
           "narratives": @ready_narratives.count,
-          "media": @ready_media.count,
+          "media": media_count,
         }
       }
     end
@@ -175,12 +176,8 @@ module Api
 
 
     def search_photos(search)
-      photos_query  = ''
-      
-      photos_query  = search_query('Photograph',photos_query)
-      photos_query  = photos_query.chomp("OR ")
       if search.present?
-       photos = Photograph.where(photos_query,:search => "%#{search}%").ids.uniq
+       photos = Photograph.where('Photographs.searchable_text::varchar ILIKE :search',:search => "%#{search}%").ids.uniq
        photos = photos.flatten.uniq
        photos = Photograph.where(id: photos)
        

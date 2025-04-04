@@ -201,7 +201,7 @@ module Api
     def make_narrative(record,year)
       if record.nil? == false
         
-        if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
           feature = {
             "id": record.id,
             "story": record.story,
@@ -211,7 +211,7 @@ module Api
         }
 
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
           feature = {
             "id": record.id,
             "story": record.story,
@@ -387,7 +387,7 @@ module Api
              url =  rails_blob_url(record.file_attachment, only_path: true)      
         end
         if record.document_category.name == "census record"
-          if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+          if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
             feature = {
               "id": record.id,
               "category": record.document_category.name,
@@ -401,7 +401,7 @@ module Api
             
 
                         
-          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+          elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
             feature = {
               "id": record.id,
               "category": record.document_category.name,

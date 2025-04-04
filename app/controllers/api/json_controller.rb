@@ -241,7 +241,19 @@ module Api
             
     end
 
+    def search_videos(search)
+      if search.present?
+       videos = Video.where('Videos.searchable_text::varchar ILIKE :search',:search => "%#{search}%").ids.uniq
+       videos = videos.flatten.uniq
+       videos = Video.where(id: videos)
+       
+      else
+        videos = nil
+      end
+      videos
 
+            
+    end
 
 
     

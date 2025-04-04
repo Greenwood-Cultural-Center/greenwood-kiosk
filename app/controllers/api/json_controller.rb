@@ -256,6 +256,57 @@ module Api
     end
 
 
+    def make_video(record,year)
+      if record.nil? == false
+        
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            
+        }
+
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
+            
+        }
+          return feature
+        elsif year == "Both"
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
+            
+        }
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
+      else
+        return
+      end
+            
+    end
+
+
+
     
     def make_person(record,year)
 

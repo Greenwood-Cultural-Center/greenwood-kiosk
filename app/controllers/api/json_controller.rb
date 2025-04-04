@@ -27,6 +27,18 @@ module Api
         
         @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,params["year"])) } 
         @ready_narratives = @ready_narratives.compact
+
+
+        @audios =  search_audios(params["search"])
+
+        @ready_media = []
+        @ready_audios =[]
+
+        @audios.each{|audio|  @ready_audios.append(make_audio(audio,params["year"])) } 
+        @ready_audios = @ready_audios.compact_blank
+
+        @ready_media << @ready_audios
+        @ready_media = @ready_media.compact_blank
         @finished_json = build_json
         response.set_header('Access-Control-Allow-Origin', '*')
         render json: @finished_json
@@ -46,6 +58,7 @@ module Api
     end
 
     private def build_json
+      media_count = @ready_audios.count
       
       census_records = 0
       @ready_documents.each  do |doc|
@@ -60,6 +73,7 @@ module Api
           {"people": @ready_people},
           {"documents": @ready_documents},
           {"narratives": @ready_narratives},
+          {"media": @ready_media},
         ],
         "count":
         { 
@@ -68,6 +82,7 @@ module Api
           "documents": @ready_documents.count,
           "census_records": census_records,
           "narratives": @ready_narratives.count,
+          "media": media_count,
         }
       }
     end
@@ -229,11 +244,8 @@ module Api
 
 
     def search_audios(search)
-      audios_query  = ''
-      audios_query  = search_query('Audio',audios_query)
-      audios_query  = audios_query.chomp("OR ")
       if search.present?
-       audios = Audio.where(audios_query,:search => "%#{search}%").ids.uniq
+       audios = Audio.where('Audios.searchable_text::varchar ILIKE :search',:search => "%#{search}%").ids.uniq
        audios = audios.flatten.uniq
        audios = Audio.where(id: audios)
        

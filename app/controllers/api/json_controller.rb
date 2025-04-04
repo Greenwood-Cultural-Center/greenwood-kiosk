@@ -41,7 +41,7 @@ module Api
 
       @audios =  search_audios(params["search"])
 
-      @ready_media = []
+
       @ready_audios =[]
 
       @audios.each{|audio|  @ready_audios.append(make_audio(audio,params["year"])) } 

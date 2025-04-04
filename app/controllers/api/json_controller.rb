@@ -21,6 +21,16 @@ module Api
       @documents.each{|document| @ready_documents.append(make_document(document,params["year"]))}
       @ready_documents = @ready_documents.compact
 
+        @videos =  search_videos(params["search"])
+
+        @ready_media = []
+        @ready_videos =[]
+
+        @videos.each{|video|  @ready_videos.append(make_video(video,params["year"])) } 
+        @ready_videos = @ready_videos.compact_blank
+
+        @ready_media << @ready_videos
+        @ready_media = @ready_media.compact_blank
 
       @narratives =  search_narratives(params["search"])
       @ready_narratives =[]
@@ -55,8 +65,7 @@ module Api
     end
 
     private def build_json
-      media_count = @ready_audios.count
-
+      media_count = @ready_videos.count + @ready_audios.count
       census_records = 0
       @ready_documents.each  do |doc|
         if doc[:category] == "census record"
@@ -192,8 +201,8 @@ module Api
 
     def make_narrative(record,year)
       if record.nil? == false
-
-        if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+        
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
           feature = {
             "id": record.id,
             "story": record.story,
@@ -201,7 +210,7 @@ module Api
             "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
           }
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
           feature = {
             "id": record.id,
             "story": record.story,
@@ -227,7 +236,19 @@ module Api
       end
     end
 
+    def search_videos(search)
+      if search.present?
+       videos = Video.where('Videos.searchable_text::varchar ILIKE :search',:search => "%#{search}%").ids.uniq
+       videos = videos.flatten.uniq
+       videos = Video.where(id: videos)
+       
+      else
+        videos = nil
+      end
+      videos
 
+            
+    end
     def search_audios(search)
       if search.present?
        audios = Audio.where('Audios.searchable_text::varchar ILIKE :search',:search => "%#{search}%").ids.uniq
@@ -279,6 +300,55 @@ module Api
       else
         return
       end
+    end
+
+    def make_video(record,year)
+      if record.nil? == false
+        
+        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            
+        }
+
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
+            
+        }
+          return feature
+        elsif year == "Both"
+          feature = {
+            "id": record.id,
+            "type": "video",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
+            
+        }
+          return feature
+        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
+      else
+        return
+      end
+            
     end
 
     def make_person(record,year)
@@ -355,7 +425,7 @@ module Api
              url =  rails_blob_url(record.file_attachment, only_path: true)      
         end
         if record.document_category.name == "census record"
-          if year == "1910" && record.people.where.associated(:census1910_records).nil? == false
+          if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
             feature = {
               "id": record.id,
               "category": record.document_category.name,
@@ -365,7 +435,7 @@ module Api
               "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
             }
             return feature
-          elsif year == "1920" && record.people.where.associated(:census1920_records).nil? == false
+          elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
             feature = {
               "id": record.id,
               "category": record.document_category.name,

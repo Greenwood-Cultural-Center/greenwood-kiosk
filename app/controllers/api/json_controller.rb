@@ -77,7 +77,7 @@ module Api
           {"buildings": @ready_buildings},
           {"people": @ready_people},
           {"documents": @ready_documents},
-          {"narratives": @ready_narratives},
+          {"stories": @ready_narratives},
           {"media": @ready_media},
         ],
         "count":
@@ -86,7 +86,7 @@ module Api
           "people": @ready_people.count,
           "documents": @ready_documents.count,
           "census_records": census_records,
-          "narratives": @ready_narratives.count,
+          "stories": @ready_narratives.count,
           "media": media_count,
         }
       }

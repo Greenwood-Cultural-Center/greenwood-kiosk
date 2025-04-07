@@ -94,16 +94,18 @@ namespace :import do
                                               suffix: record.street_suffix,
                                               city: record.city,
                                               is_primary: true
-
+      
+       actual_address = address.address                                       
       record.building = address.building || Building.create(
-        name: address,
+        name: actual_address,
         locality: record.locality,
         building_type_ids: [1],
         lat: row['Latitude'],
         lon: row['Longitude'],
         addresses: [address]
       )
-
+   
+      record.building.name = actual_address
       # Not going to sweat if the record doesn't save because this is just for developers to load some census records
       rows_count += 1
       record.save && saved_count += 1

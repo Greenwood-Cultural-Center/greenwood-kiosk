@@ -6,6 +6,7 @@ module Api
  
     def json
       @buildings =  @@search_controller.search_buildings(params["search"],params["year"])
+      binding.pry
       @ready_buildings =[]
       @buildings.each{|building|  @ready_buildings.append(make_building(building,params["year"])) } 
       @ready_buildings = @ready_buildings.compact

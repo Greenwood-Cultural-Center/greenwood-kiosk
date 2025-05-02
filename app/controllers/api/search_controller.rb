@@ -124,18 +124,18 @@ module Api
           people_year = "people_#{target_year}".to_sym
           person_query = "person_query#{target_year}".to_sym
           census_query = "census#{target_year}_query".to_sym
-          #binding.pry
+          
           buildings3 = Building.joins(census_record_year).where(binding.local_variable_get(census_query),:search => "%#{target}%").ids.uniq
           buildings_people1910 = Building.joins(people_year).where(binding.local_variable_get(person_query),:search => "%#{target}%").ids.uniq
-          binding.pry
-          people_photo1910 = Building.joins(people_1910: :photos).where('Photographs.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq
-          people_video1910 = Building.joins(people_1910: :videos).where('Videos.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq
-          people_audio1910 = Building.joins(people_1910: :audios).where('Audios.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq
-          people_narrative1910 = Building.joins(people_1910: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq
-          people_document1910 = Building.joins(people_1910: :documents).where(documents_query,:search => "%#{target}%").ids.uniq
+          
+          people_photo1910 =eval(%Q[Building.joins(#{people_year}: :photos).where('Photographs.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq])
+          people_video1910 = eval(%Q[Building.joins(#{people_year}: :videos).where('Videos.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq])
+          people_audio1910 = eval(%Q[Building.joins(#{people_year}: :audios).where('Audios.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq])
+          people_narrative1910 = eval(%Q[Building.joins(#{people_year}: :narratives).where(narrative_query,:search => "%#{target}%").ids.uniq])
+          people_document1910 = eval(%Q[Building.joins(#{people_year}: :documents).where(documents_query,:search => "%#{target}%").ids.uniq])
 
-          narrative_action_text_story1910 = Building.joins(people_1910: [{narratives: :rich_text_story}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
-          narrative_action_text_sources1910 = Building.joins(people_1910: [{narratives: :rich_text_sources}]).where(rich_text_query,:search => "%#{target}%").ids.uniq
+          narrative_action_text_story1910 = eval(%Q[Building.joins(#{people_year}: [{narratives: :rich_text_story}]).where(rich_text_query,:search => "%#{target}%").ids.uniq])
+          narrative_action_text_sources1910 = eval(%Q[Building.joins(#{people_year}: [{narratives: :rich_text_sources}]).where(rich_text_query,:search => "%#{target}%").ids.uniq])
 
           buildings << building_photo
           buildings << building_video

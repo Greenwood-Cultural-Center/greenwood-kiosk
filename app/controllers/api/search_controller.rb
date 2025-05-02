@@ -119,6 +119,12 @@ module Api
           building_action_text_description = Building.joins(:rich_text_description).where(rich_text_query,:search => "%#{target}%").ids.uniq
           building_address = Building.joins(:addresses).where(address_query,:search => "%#{target}%").ids.uniq
 
+          
+          census_record_year = "census#{target_year}_records".to_sym
+          people_year = "people_#{target_year}".to_sym
+          person_query = "person_query#{target_year}".to_sym
+          census_query = "census#{target_year}_query".to_sym
+          binding.pry
           buildings3 = Building.joins(:census1910_records).where(census1910_query,:search => "%#{target}%").ids.uniq
           buildings_people1910 = Building.joins(:people_1910).where(person_query1910,:search => "%#{target}%").ids.uniq
           people_photo1910 = Building.joins(people_1910: :photos).where('Photographs.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq

@@ -124,9 +124,10 @@ module Api
           people_year = "people_#{target_year}".to_sym
           person_query = "person_query#{target_year}".to_sym
           census_query = "census#{target_year}_query".to_sym
+          #binding.pry
+          buildings3 = Building.joins(census_record_year).where(binding.local_variable_get(census_query),:search => "%#{target}%").ids.uniq
+          buildings_people1910 = Building.joins(people_year).where(binding.local_variable_get(person_query),:search => "%#{target}%").ids.uniq
           binding.pry
-          buildings3 = Building.joins(:census1910_records).where(census1910_query,:search => "%#{target}%").ids.uniq
-          buildings_people1910 = Building.joins(:people_1910).where(person_query1910,:search => "%#{target}%").ids.uniq
           people_photo1910 = Building.joins(people_1910: :photos).where('Photographs.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq
           people_video1910 = Building.joins(people_1910: :videos).where('Videos.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq
           people_audio1910 = Building.joins(people_1910: :audios).where('Audios.searchable_text::varchar ILIKE :search',:search => "%#{target}%").ids.uniq

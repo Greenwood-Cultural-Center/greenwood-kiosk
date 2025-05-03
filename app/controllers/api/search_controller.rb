@@ -154,56 +154,7 @@ module Api
       if record.photos.empty? == false
       record.photos.each {|photo| building_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       end
-      if year == '1920'
-
-        feature = {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Point',
-            'coordinates': record.coordinates
-          },
-          'properties': {
-            'location_id': record.id,
-            'title': record.primary_street_address,
-            'addresses': record.addresses,
-            'audios': record.audios,
-            'narratives': building_narratives,
-            'videos': record.videos,
-            'photos': building_photos,
-            'description': record.full_street_address,
-            'rich_description': record.rich_text_description,
-            '1910': [],
-            '1920': record.census1920_records,
-            '1910_people': [],
-            '1920_people': person_array_1920
-          }
-        }
-
-      elsif year == '1910'
-        feature = {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Point',
-            'coordinates': record.coordinates
-          },
-        'properties': {
-            'location_id': record.id,
-            'title':  record.primary_street_address,
-            'addresses': record.addresses,
-            'audios': record.audios,
-            'narratives': building_narratives,
-            'videos': record.videos,
-            'photos': building_photos,
-            'description': record.full_street_address,
-            'rich_description': record.rich_text_description,
-            '1910': record.census1910_records,
-            '1920': [],
-            '1910_people': person_array_1910,
-            '1920_people': []
-          }
-        }
-
-      elsif year == 'Both'
+      
         feature = {
           'type': 'Feature',
           'geometry': {
@@ -226,7 +177,7 @@ module Api
             '1920_people': person_array_1920
           }
         }
-      end
+      
 
       if feature[:properties][:'1920'].empty? && year == '1920'
         return

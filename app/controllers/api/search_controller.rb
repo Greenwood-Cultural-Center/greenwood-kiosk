@@ -171,10 +171,10 @@ module Api
             'photos': building_photos,
             'description': record.full_street_address,
             'rich_description': record.rich_text_description,
-            '1910': record.census1910_records,
-            '1920': record.census1920_records,
-            '1910_people': person_array_1910,
-            '1920_people': person_array_1920
+            '1910': year == '1910' ? record.census1910_records : [],
+            '1920':year == '1920' ? record.census1920_records : [],
+            '1910_people': year == '1910' ? person_array_1910 : [],
+            '1920_people': year == '1920' ? person_array_1920 : []
           }
         }
       

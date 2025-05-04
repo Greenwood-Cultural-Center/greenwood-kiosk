@@ -205,13 +205,20 @@ module Api
     end
 
     def search
-      @buildings = search_buildings(params['search'],params['year'])
+      @ready_geojson=[]
+      list_years = ['1910','1920']
+      list_years.each do |year|
+      @buildings = search_buildings(params['search'],year)
       @ready_buildings =[]
+      
 
-      @buildings.each{|building|  @ready_buildings.append(make_feature(building,params['year'])) }
-      @geojson = build_geojson
+      @buildings.each{|building|  @ready_buildings.append(make_feature(building,year)) }
+      @geojson = build_geojson(year)
+      @ready_geojson.append(@geojson)
+      end
+      
       response.set_header('Access-Control-Allow-Origin', '*')
-      render json: @geojson
+      render json: @ready_geojson
     end
 
     private def search_query(class_name,chosen_query)
@@ -227,11 +234,14 @@ module Api
     end
 
 
-    private def build_geojson
-      {
-        type: 'FeatureCollection',
-        features: @ready_buildings
-      }
+    private def build_geojson(year)
+      rough_geojson = { 
+             year => {
+                    type: 'FeatureCollection',
+                    features: @ready_buildings
+                    }
+    }
+    return rough_geojson
 
     end
 

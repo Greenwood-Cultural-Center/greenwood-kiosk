@@ -607,7 +607,7 @@ module Api
           @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
           @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq 
           @people_buildings1910 = Person.joins(:buildings_1910).where(@building_query,:search => "%#{search}%").ids.uniq
-          @people_buildings1920 = Person.joins(:buildings_1920).where@building_query,:search => "%#{search}%").ids.uniq
+          @people_buildings1920 = Person.joins(:buildings_1920).where(@building_query,:search => "%#{search}%").ids.uniq
           @people << @people_photo
           @people << @people_video
           @people << @people_audio

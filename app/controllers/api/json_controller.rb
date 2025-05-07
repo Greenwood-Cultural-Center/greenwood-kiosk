@@ -600,8 +600,6 @@ module Api
           @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
           @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
           @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
           @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
@@ -614,8 +612,6 @@ module Api
           @people << @people_narrative
           @people <<  @people_action_text_sources
           @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
           @people << @people_document
 
           @people << @people_census1920
@@ -632,8 +628,6 @@ module Api
           @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
           @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
           @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
           @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
@@ -644,8 +638,6 @@ module Api
           @people << @people_narrative
           @people <<  @people_action_text_sources
           @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
           @people << @people_document
 
           @people << @people_census1910
@@ -661,8 +653,6 @@ module Api
           @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
           @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
           @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
           @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
@@ -674,8 +664,6 @@ module Api
           @people << @people_narrative
           @people <<  @people_action_text_sources
           @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
           @people << @people_document
 
           @people << @people_census1920

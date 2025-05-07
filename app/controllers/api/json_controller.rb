@@ -558,7 +558,6 @@ module Api
     def search_people(search,year)
       @census_query = ''
       @building_query = ''
-      @census1910_query=''
       @person_query = ''
       @audio_query = ''
       @video_query = ''
@@ -568,8 +567,7 @@ module Api
       @address_query = ''
       @documents_query  = ''
 
-      @census_query = search_query('Census1920Record',@census_query)
-      @census1910_query = search_query('Census1910Record',@census1910_query)
+      @census_query = search_query("Census#{year}Record",@census_query)
       @building_query = search_query('Building',@building_query)
       @person_query = search_query('Person',@person_query)
       @audio_query = search_query('Audio',@audio_query)
@@ -579,9 +577,9 @@ module Api
       @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
       @address_query = search_query('Address',@address_query)
       @documents_query  = search_query('Document',@documents_query)
+
       @building_query = @building_query.chomp("OR ")
       @census_query = @census_query.chomp("OR ")
-      @census1910_query = @census1910_query.chomp("OR ")
       @person_query = @person_query.chomp("OR ")
       @audio_query = @audio_query.chomp("OR ")
       @video_query = @video_query.chomp("OR ")
@@ -602,10 +600,14 @@ module Api
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
-          @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
-          @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq 
-          @people_buildings1910 = Person.joins(:buildings_1910).where(@person_query,:search => "%#{search}%").ids.uniq
-          @people_buildings1920 = Person.joins(:buildings_1920).where(@person_query,:search => "%#{search}%").ids.uniq
+          census_record_year = :"census#{target_year}_records"
+          building_year = :"buildings_#{target_year}"
+
+
+
+          @people_census = Person.joins(census_record_year).where(@census_query,:search => "%#{search}%").ids.uniq
+          @people_buildings = Person.joins(building_year).where(@person_query,:search => "%#{search}%").ids.uniq
+          
           @people << @people_photo
           @people << @people_video
           @people << @people_audio
@@ -614,10 +616,9 @@ module Api
           @people <<  @people_action_text_story
           @people << @people_document
 
-          @people << @people_census1920
-          @people << @people_census1910
-          @people << @people_buildings1910
-          @people << @people_buildings1920
+          
+          @people << @people_census
+          @people << @people_buildings
           @people = @people.flatten.uniq
           @people = Person.where(id: @people)
         elsif year == '1910'

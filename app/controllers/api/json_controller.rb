@@ -444,35 +444,23 @@ module Api
       end
       person_narratives = []
       record.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
+      #is this person_photos below needed?
       person_photos = []
       if record.photos.empty? == false
         record.photos.each {|photo| person_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       end
-      if year == '1920'
+      #is this person_photos above needed?
+      
+        captured_1910 = year == '1910' ? get_censusrecord(record.census1910_records) : []
+        captured_1920 = year == '1920' ? get_censusrecord(record.census1920_records) : []
         feature = {
           "id": record.id,
           "name": record.name,
           "description": record.description,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"buildings": record.buildings,"media": get_media(record)  ],
+          "properties": ["census_records1920": captured_1920,"census_records1910": captured_1910,"buildings": record.buildings,"media": get_media(record)  ],
           "stories": person_narratives
         }
-      elsif year == '1910'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-          "stories": person_narratives
-        }
-      elsif year == 'Both'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-          "stories": person_narratives
-        }
-      end
+      
       if record.census1920_records.empty? && year =='1920'
         return
       end

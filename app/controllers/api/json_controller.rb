@@ -91,7 +91,7 @@ module Api
         }
       }
     end
-    def make_building(record,year)
+    def make_building(record,year) #should this have a record.nil? check like  the make methods for doc,narrative,photo,audio,video?
       def get_media(record)
         media_array = []
 
@@ -411,7 +411,7 @@ module Api
             
     end
 
-    def make_person(record,year)
+    def make_person(record,year) #should this have a record.nil? check like  the make methods for doc,narrative,photo,audio,video?
       def get_media(record)
         media_array = []
         record.photos.each {|photo| media_array.append({"type": "photo","id": photo.id})}
@@ -473,43 +473,25 @@ module Api
              url =  rails_blob_url(record.file_attachment, only_path: true)
         end
         if record.document_category.name.downcase == "census record" || record.document_category.name.downcase == "census" || record.document_category.name.downcase == "census records"
-          census_people = :"census#{target_year}_records"
+          census_people = :"census#{year}_records"
           
-          if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
-            }
-            return feature
-          elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
-            }
-            return feature
-          elsif year == "Both"
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.ids.uniq ],
-            }
-            return feature
-          elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-            return
-          elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          if year == "1920" && record.people.where.associated(:census1920_records).empty?
             return
           end
+          if year == "1910" && record.people.where.associated(:census1910_records).empty?
+            return
+          end
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "URL": url,
+              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
+            }
+            return feature
+         
+          
         else
           feature = {
             "id": record.id,

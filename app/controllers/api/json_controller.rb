@@ -473,6 +473,8 @@ module Api
              url =  rails_blob_url(record.file_attachment, only_path: true)
         end
         if record.document_category.name.downcase == "census record" || record.document_category.name.downcase == "census" || record.document_category.name.downcase == "census records"
+          census_people = :"census#{target_year}_records"
+          
           if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
             feature = {
               "id": record.id,
@@ -480,7 +482,7 @@ module Api
               "name": record.name,
               "description": record.description,
               "URL": url,
-              "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
+              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
             }
             return feature
           elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
@@ -490,7 +492,7 @@ module Api
               "name": record.name,
               "description": record.description,
               "URL": url,
-              "properties": ["people": record.people.where.associated(:census1920_records).ids.uniq ],
+              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
             }
             return feature
           elsif year == "Both"

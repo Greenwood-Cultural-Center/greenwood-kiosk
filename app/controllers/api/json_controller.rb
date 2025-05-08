@@ -133,40 +133,24 @@ module Api
       if record.photos.empty? == false
       record.photos.each {|photo| building_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       end
-      if year == '1920'
+      captured_1910 = year == '1910' ? get_censusrecord(record.census1910_records) : []
+      captured_1920 = year == '1920' ? get_censusrecord(record.census1920_records) : []
+
+      captured_person_array1910 = year == '1910' ? person_array_1910 : []
+      captured_person_array1920 = year == '1920' ? person_array_1920 : []
+      
+     
         feature = {
           "id": record.id,
           "name": record.name,
           "description": record.description,
           "address": record.primary_street_address,
           "location": record.coordinates,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"people1920": person_array_1920, "people1910": [],"media": get_media(record)  ],
+          "properties": ["census_records1920": captured_1920, "census_records1910": captured_1910, "people1920": captured_person_array1920, "people1910": captured_person_array1910,"media": get_media(record)  ],
           "rich_description": record.rich_text_description,
           "stories": building_narratives
         }
-      elsif year == '1910'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "address": record.primary_street_address,
-          "location": record.coordinates,
-          "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": [], "people1910": person_array_1910,"media": get_media(record)  ],
-          "rich_description": record.rich_text_description,
-          "stories": building_narratives
-        }
-      elsif year == 'Both'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "address": record.primary_street_address,
-          "location": record.coordinates,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": person_array_1920, "people1910": person_array_1910,"media": get_media(record)  ],
-          "rich_description": record.rich_text_description,
-          "stories": building_narratives
-        }
-      end
+      
       if record.census1920_records.empty? && year =='1920'
         return
       end

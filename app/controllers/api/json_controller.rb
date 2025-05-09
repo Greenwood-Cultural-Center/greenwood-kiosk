@@ -91,7 +91,7 @@ module Api
         }
       }
     end
-    def make_building(record,year)
+    def make_building(record,year) #should this have a record.nil? check like  the make methods for doc,narrative,photo,audio,video?
       def get_media(record)
         media_array = []
 
@@ -133,40 +133,24 @@ module Api
       if record.photos.empty? == false
       record.photos.each {|photo| building_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       end
-      if year == '1920'
+      captured_1910 = year == '1910' ? get_censusrecord(record.census1910_records) : []
+      captured_1920 = year == '1920' ? get_censusrecord(record.census1920_records) : []
+
+      captured_person_array1910 = year == '1910' ? person_array_1910 : []
+      captured_person_array1920 = year == '1920' ? person_array_1920 : []
+      
+     
         feature = {
           "id": record.id,
           "name": record.name,
           "description": record.description,
           "address": record.primary_street_address,
           "location": record.coordinates,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"people1920": person_array_1920, "people1910": [],"media": get_media(record)  ],
+          "properties": ["census_records1920": captured_1920, "census_records1910": captured_1910, "people1920": captured_person_array1920, "people1910": captured_person_array1910,"media": get_media(record)  ],
           "rich_description": record.rich_text_description,
           "stories": building_narratives
         }
-      elsif year == '1910'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "address": record.primary_street_address,
-          "location": record.coordinates,
-          "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": [], "people1910": person_array_1910,"media": get_media(record)  ],
-          "rich_description": record.rich_text_description,
-          "stories": building_narratives
-        }
-      elsif year == 'Both'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "address": record.primary_street_address,
-          "location": record.coordinates,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"people1920": person_array_1920, "people1910": person_array_1910,"media": get_media(record)  ],
-          "rich_description": record.rich_text_description,
-          "stories": building_narratives
-        }
-      end
+      
       if record.census1920_records.empty? && year =='1920'
         return
       end
@@ -193,58 +177,36 @@ module Api
 
     def make_photo(record,year)
       if record.nil? == false
-
+        census_people = :"census#{year}_records"
         url = ""
         thumbnail = ""
         if record.file_attachment.nil? == false
              url =  rails_blob_url(record.file_attachment, only_path: true)  
-            # require 'base64'
+            
              thumbnail = rails_blob_url(record.file_attachment, host: ENV['BASE_URL'])  
-             #binding.pry
-             #thumbnail = File.open(thumbnail).read
-             #encoded =  Base64.encode64(thumbnail)
-             #binding.pry
+            
         end
 
-        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+        if year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        end
+        if year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
           feature = {
             "id": record.id,
             "type": "photo",
             "description": record.description,
             "caption": record.caption,
             "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(census_people).ids],
             
         }
 
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-          feature = {
-            "id": record.id,
-            "type": "photo",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
-            
-        }
-          return feature
-        elsif year == "Both"
-          feature = {
-            "id": record.id,
-            "type": "photo",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.ids],
-            
-        }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-          return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
-          return
-        end
+        
+        
         
       else
         return
@@ -278,35 +240,23 @@ module Api
     def make_narrative(record,year)
       if record.nil? == false
         
-        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+       
+          census_people = :"census#{year}_records"
+          
+          if year == "1920" && record.people.where.associated(:census1920_records).empty?
+            return
+          end
+          if year == "1910" && record.people.where.associated(:census1910_records).empty?
+            return
+          end
           feature = {
             "id": record.id,
             "story": record.story,
             "sources": record.sources,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(census_people).ids],
           }
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-          feature = {
-            "id": record.id,
-            "story": record.story,
-            "sources": record.sources,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
-          }
-          return feature
-        elsif year == "Both"
-          feature = {
-            "id": record.id,
-            "story": record.story,
-            "sources": record.sources,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
-          }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-          return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
-          return
-        end
+       
       else
         return
       end
@@ -338,41 +288,26 @@ module Api
 
     def make_audio(record,year)
       if record.nil? == false
-        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
-          feature = {
-            "id": record.id,
-            "type": "audio",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
-          }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-          feature = {
-            "id": record.id,
-            "type": "audio",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
-          }
-          return feature
-        elsif year == "Both"
-          feature = {
-            "id": record.id,
-            "type": "audio",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
-          }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-          return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+        census_people = :"census#{year}_records"
+        
+        if year == "1920" && record.people.where.associated(:census1920_records).empty?
           return
         end
+        if year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+
+          feature = {
+            "id": record.id,
+            "type": "audio",
+            "description": record.description,
+            "caption": record.caption,
+            "URL": record.remote_url,
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(census_people).ids],
+          }
+          return feature
+       
+
       else
         return
       end
@@ -380,46 +315,29 @@ module Api
 
     def make_video(record,year)
       if record.nil? == false
+        census_people = :"census#{year}_records"
+
+        if year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        end
+        if year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
         
-        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
           feature = {
             "id": record.id,
             "type": "video",
             "description": record.description,
             "caption": record.caption,
             "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(census_people).ids],
             
         }
 
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-          feature = {
-            "id": record.id,
-            "type": "video",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
-            
-        }
-          return feature
-        elsif year == "Both"
-          feature = {
-            "id": record.id,
-            "type": "video",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": record.remote_url,
-            "properties": ["buildings": record.buildings.ids, "people": record.people.ids],
-            
-        }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-          return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
-          return
-        end
+        
+        
+
         
       else
         return
@@ -427,7 +345,7 @@ module Api
             
     end
 
-    def make_person(record,year)
+    def make_person(record,year) #should this have a record.nil? check like  the make methods for doc,narrative,photo,audio,video?
       def get_media(record)
         media_array = []
         record.photos.each {|photo| media_array.append({"type": "photo","id": photo.id})}
@@ -444,35 +362,23 @@ module Api
       end
       person_narratives = []
       record.narratives.each {|narrative| person_narratives.append({record: narrative,sources:narrative.sources,story:narrative.story})}
+      #is this person_photos below needed?
       person_photos = []
       if record.photos.empty? == false
         record.photos.each {|photo| person_photos.append({record: photo,attatchment:photo.file_attachment,url:rails_blob_url(photo.file_attachment, only_path: true)}) }
       end
-      if year == '1920'
+      #is this person_photos above needed?
+      
+        captured_1910 = year == '1910' ? get_censusrecord(record.census1910_records) : []
+        captured_1920 = year == '1920' ? get_censusrecord(record.census1920_records) : []
         feature = {
           "id": record.id,
           "name": record.name,
           "description": record.description,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records),"census_records1910": [],"buildings": record.buildings,"media": get_media(record)  ],
+          "properties": ["census_records1920": captured_1920,"census_records1910": captured_1910,"buildings": record.buildings,"media": get_media(record)  ],
           "stories": person_narratives
         }
-      elsif year == '1910'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "properties": ["census_records1920":[] ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-          "stories": person_narratives
-        }
-      elsif year == 'Both'
-        feature = {
-          "id": record.id,
-          "name": record.name,
-          "description": record.description,
-          "properties": ["census_records1920": get_censusrecord(record.census1920_records) ,"census_records1910": get_censusrecord(record.census1910_records),"buildings": record.buildings,"media": get_media(record)  ],
-          "stories": person_narratives
-        }
-      end
+      
       if record.census1920_records.empty? && year =='1920'
         return
       end
@@ -501,41 +407,25 @@ module Api
              url =  rails_blob_url(record.file_attachment, only_path: true)
         end
         if record.document_category.name.downcase == "census record" || record.document_category.name.downcase == "census" || record.document_category.name.downcase == "census records"
-          if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.where.associated(:census1910_records).ids.uniq ],
-            }
-            return feature
-          elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.where.associated(:census1920_records).ids.uniq ],
-            }
-            return feature
-          elsif year == "Both"
-            feature = {
-              "id": record.id,
-              "category": record.document_category.name,
-              "name": record.name,
-              "description": record.description,
-              "URL": url,
-              "properties": ["people": record.people.ids.uniq ],
-            }
-            return feature
-          elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-            return
-          elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
+          census_people = :"census#{year}_records"
+          
+          if year == "1920" && record.people.where.associated(:census1920_records).empty?
             return
           end
+          if year == "1910" && record.people.where.associated(:census1910_records).empty?
+            return
+          end
+            feature = {
+              "id": record.id,
+              "category": record.document_category.name,
+              "name": record.name,
+              "description": record.description,
+              "URL": url,
+              "properties": ["people": record.people.where.associated(census_people).ids.uniq ],
+            }
+            return feature
+         
+          
         else
           feature = {
             "id": record.id,
@@ -558,7 +448,6 @@ module Api
     def search_people(search,year)
       @census_query = ''
       @building_query = ''
-      @census1910_query=''
       @person_query = ''
       @audio_query = ''
       @video_query = ''
@@ -568,8 +457,7 @@ module Api
       @address_query = ''
       @documents_query  = ''
 
-      @census_query = search_query('Census1920Record',@census_query)
-      @census1910_query = search_query('Census1910Record',@census1910_query)
+      @census_query = search_query("Census#{year}Record",@census_query)
       @building_query = search_query('Building',@building_query)
       @person_query = search_query('Person',@person_query)
       @audio_query = search_query('Audio',@audio_query)
@@ -579,9 +467,9 @@ module Api
       @rich_text_query = search_query('ActionText::RichText',@rich_text_query)
       @address_query = search_query('Address',@address_query)
       @documents_query  = search_query('Document',@documents_query)
+
       @building_query = @building_query.chomp("OR ")
       @census_query = @census_query.chomp("OR ")
-      @census1910_query = @census1910_query.chomp("OR ")
       @person_query = @person_query.chomp("OR ")
       @audio_query = @audio_query.chomp("OR ")
       @video_query = @video_query.chomp("OR ")
@@ -592,7 +480,6 @@ module Api
       @documents_query  = @documents_query.chomp("OR ")
 
       if search.present?
-        if year == 'Both'
           @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
           @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
           @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
@@ -600,90 +487,30 @@ module Api
           @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
           @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
           @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
           @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
 
-          @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
-          @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq 
-          @people_buildings1910 = Person.joins(:buildings_1910).where(@person_query,:search => "%#{search}%").ids.uniq
-          @people_buildings1920 = Person.joins(:buildings_1920).where(@person_query,:search => "%#{search}%").ids.uniq
+          census_record_year = :"census#{year}_records"
+          building_year = :"buildings_#{year}"
+
+
+
+          @people_census = Person.joins(census_record_year).where(@census_query,:search => "%#{search}%").ids.uniq
+          @people_buildings = Person.joins(building_year).where(@person_query,:search => "%#{search}%").ids.uniq
+          
           @people << @people_photo
           @people << @people_video
           @people << @people_audio
           @people << @people_narrative
           @people <<  @people_action_text_sources
           @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
           @people << @people_document
 
-          @people << @people_census1920
-          @people << @people_census1910
-          @people << @people_buildings1910
-          @people << @people_buildings1920
+          
+          @people << @people_census
+          @people << @people_buildings
           @people = @people.flatten.uniq
           @people = Person.where(id: @people)
-        elsif year == '1910'
-          @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
-          @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_audio = Person.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
-          @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
-          @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
-
-          @people_census1910 = Person.joins(:census1910_records).where(@census1910_query,:search => "%#{search}%").ids.uniq
-          @people_buildings1910 = Person.joins(:buildings_1910).where(@person_query,:search => "%#{search}%").ids.uniq
-          @people << @people_photo
-          @people << @people_video
-          @people << @people_audio
-          @people << @people_narrative
-          @people <<  @people_action_text_sources
-          @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
-          @people << @people_document
-
-          @people << @people_census1910
-          @people << @people_buildings1910
-
-          @people = @people.flatten.uniq
-          @people = Person.where(id: @people)
-        elsif year == '1920'
-          @people = Person.where(@person_query,:search => "%#{search}%").ids.uniq
-          @people_photo = Person.joins(:photos).where("Photographs.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_video = Person.joins(:videos).where("Videos.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_audio = Person.joins(:audios).where("Audios.searchable_text::varchar ILIKE :search",:search => "%#{search}%").ids.uniq
-          @people_narrative = Person.joins(:narratives).where(@narrative_query,:search => "%#{search}%").ids.uniq
-          @people_action_text_story = Person.joins(narratives: :rich_text_story).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          @people_action_text_sources = Person.joins(narratives: :rich_text_sources).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_action_text_description = Person.joins(:rich_text_description).where(@rich_text_query,:search => "%#{search}%").ids.uniq
-          # @people_address = Person.joins(:addresses).where(@address_query,:search => "%#{search}%").ids.uniq
-          @people_document = Person.joins(:documents).where(@documents_query,:search => "%#{search}%").ids.uniq
-
-          @people_census1920 = Person.joins(:census1920_records).where(@census_query,:search => "%#{search}%").ids.uniq
-          @people_buildings1920 = Person.joins(:buildings_1920).where(@person_query,:search => "%#{search}%").ids.uniq
-
-          @people << @people_photo
-          @people << @people_video
-          @people << @people_audio
-          @people << @people_narrative
-          @people <<  @people_action_text_sources
-          @people <<  @people_action_text_story
-          # @people << @people_action_text_description
-          # @people << @people_address
-          @people << @people_document
-
-          @people << @people_census1920
-          @people << @people_buildings1920
-
-          @people = @people.flatten.uniq
-          @people = Person.where(id: @people)
-        end
+        
       else
         @buildings = Building.all
       end

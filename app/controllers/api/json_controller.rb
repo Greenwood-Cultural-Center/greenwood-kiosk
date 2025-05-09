@@ -177,58 +177,36 @@ module Api
 
     def make_photo(record,year)
       if record.nil? == false
-
+        census_people = :"census#{year}_records"
         url = ""
         thumbnail = ""
         if record.file_attachment.nil? == false
              url =  rails_blob_url(record.file_attachment, only_path: true)  
-            # require 'base64'
+            
              thumbnail = rails_blob_url(record.file_attachment, host: ENV['BASE_URL'])  
-             #binding.pry
-             #thumbnail = File.open(thumbnail).read
-             #encoded =  Base64.encode64(thumbnail)
-             #binding.pry
+            
         end
 
-        if year == "1910" && record.people.where.associated(:census1910_records).empty? == false
+        if year == "1920" && record.people.where.associated(:census1920_records).empty?
+          return
+        end
+        if year == "1910" && record.people.where.associated(:census1910_records).empty?
+          return
+        end
+        
           feature = {
             "id": record.id,
             "type": "photo",
             "description": record.description,
             "caption": record.caption,
             "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(:census1910_records).ids],
+            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(census_people).ids],
             
         }
 
           return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty? == false
-          feature = {
-            "id": record.id,
-            "type": "photo",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.where.associated(:census1920_records).ids],
-            
-        }
-          return feature
-        elsif year == "Both"
-          feature = {
-            "id": record.id,
-            "type": "photo",
-            "description": record.description,
-            "caption": record.caption,
-            "URL": url,
-            "properties": ["thumbnail": thumbnail,"buildings": record.buildings.ids, "people": record.people.ids],
-            
-        }
-          return feature
-        elsif year == "1920" && record.people.where.associated(:census1920_records).empty?
-          return
-        elsif year == "1910" && record.people.where.associated(:census1910_records).empty?
-          return
-        end
+        
+        
         
       else
         return

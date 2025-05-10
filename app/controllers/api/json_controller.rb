@@ -5,20 +5,24 @@ module Api
     @@search_controller = SearchController.new
  
     def json
-      @buildings =  @@search_controller.search_buildings(params["search"],params["year"])
+      @ready_json=[]
+      list_years = ['1910','1920']
+
+      list_years.each do |list_year|
+      @buildings =  @@search_controller.search_buildings(params["search"],list_year)
       @ready_buildings =[]
-      @buildings.each{|building|  @ready_buildings.append(make_building(building,params["year"])) } 
+      @buildings.each{|building|  @ready_buildings.append(make_building(building,list_year)) } 
       @ready_buildings = @ready_buildings.compact
-      @people =  search_people(params["search"],params["year"])
+      @people =  search_people(params["search"],list_year)
       @ready_people =[]
 
-      @people.each{|person|  @ready_people.append(make_person(person,params["year"])) } 
+      @people.each{|person|  @ready_people.append(make_person(person,list_year)) } 
       @ready_people = @ready_people.compact
 
       @documents =  search_documents(params["search"])
       @ready_documents = []
 
-      @documents.each{|document| @ready_documents.append(make_document(document,params["year"]))}
+      @documents.each{|document| @ready_documents.append(make_document(document,list_year))}
       @ready_documents = @ready_documents.compact
 
       @videos =  search_videos(params["search"])
@@ -30,9 +34,9 @@ module Api
       @ready_photos = []
       @ready_media  = []
 
-      @videos.each{|video|  @ready_videos.append(make_video(video,params["year"])) } 
-      @audios.each{|audio|  @ready_audios.append(make_audio(audio,params["year"])) } 
-      @photos.each{|photo|  @ready_photos.append(make_photo(photo,params["year"])) } 
+      @videos.each{|video|  @ready_videos.append(make_video(video,list_year)) } 
+      @audios.each{|audio|  @ready_audios.append(make_audio(audio,list_year)) } 
+      @photos.each{|photo|  @ready_photos.append(make_photo(photo,list_year)) } 
 
       @ready_videos = @ready_videos.compact_blank
       @ready_audios = @ready_audios.compact_blank
@@ -45,12 +49,14 @@ module Api
       @narratives =  search_narratives(params["search"])
       @ready_narratives =[]
 
-      @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,params["year"])) } 
+      @narratives.each{|narrative|  @ready_narratives.append(make_narrative(narrative,list_year)) } 
       @ready_narratives = @ready_narratives.compact
 
-      @finished_json = build_json
+      @finished_json = build_json(list_year)
+      @ready_json.append(@finished_json)
+      end
       response.set_header('Access-Control-Allow-Origin', '*')
-      render json: @finished_json
+      render json: @ready_json
     end
 
     private def search_query(class_name,chosen_query)
@@ -63,7 +69,7 @@ module Api
       chosen_query
     end
 
-    private def build_json
+    private def build_json(year)
       media_count = @ready_media.count
       census_records = 0
       @ready_documents.each  do |doc|
@@ -71,7 +77,8 @@ module Api
           census_records += 1
         end
       end
-      {
+    rough_json = { 
+      year =>  {
         "results":
         [
           {"buildings": @ready_buildings},
@@ -90,6 +97,7 @@ module Api
           "media": media_count,
         }
       }
+    }
     end
     def make_building(record,year)
       def get_media(record)

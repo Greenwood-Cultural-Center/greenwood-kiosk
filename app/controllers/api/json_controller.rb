@@ -6,6 +6,7 @@ module Api
  
     def json
       @ready_json=[]
+      @ready_count = {"count": []}
       @final_buildings= 0
       @final_people= 0 
       @final_documents= 0 
@@ -59,7 +60,8 @@ module Api
       @ready_narratives = @ready_narratives.compact
 
       @finished_json = build_json(list_year)
-      @ready_json.append(@finished_json)
+      @ready_json.append(@finished_json[0])
+      @ready_count[:count].append(@finished_json[1])
 
       end
 
@@ -75,6 +77,7 @@ module Api
         
 
       }}
+      @ready_json.append(@ready_count)
       @ready_json.append(total_count)
       response.set_header('Access-Control-Allow-Origin', '*')
       render json: @ready_json
@@ -108,7 +111,11 @@ module Api
           {"stories": @ready_narratives},
           {"media": @ready_media},
         ],
-        "count":
+        
+      }
+    }
+    rough_count = {
+    year=>
         {
           "buildings": @ready_buildings.count,
           "people": @ready_people.count,
@@ -118,7 +125,6 @@ module Api
           "media": media_count,
         }
       }
-    }
     
     @final_buildings+=@ready_buildings.count
     @final_people+=@ready_people.count
@@ -127,7 +133,8 @@ module Api
     @final_stories+= @ready_narratives.count
     @final_media+=media_count
     
-    return rough_json
+    
+    return [rough_json,rough_count]
 
     end
     def make_building(record,year)

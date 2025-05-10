@@ -5,8 +5,8 @@ module Api
     @@search_controller = SearchController.new
  
     def json
-      @ready_json=[]
-      @ready_count = {"count": []}
+      @ready_json={"results": [],"count": []}
+      @ready_count = []
       @final_buildings= 0
       @final_people= 0 
       @final_documents= 0 
@@ -60,8 +60,8 @@ module Api
       @ready_narratives = @ready_narratives.compact
 
       @finished_json = build_json(list_year)
-      @ready_json.append(@finished_json[0])
-      @ready_count[:count].append(@finished_json[1])
+      @ready_json[:results].append(@finished_json[0])
+      @ready_count.append(@finished_json[1])
 
       end
 
@@ -77,8 +77,8 @@ module Api
         
 
       }}
-      @ready_json.append(@ready_count)
-      @ready_json.append(total_count)
+      @ready_count.append(total_count)
+      @ready_json[:count].append(@ready_count)
       response.set_header('Access-Control-Allow-Origin', '*')
       render json: @ready_json
     end
@@ -102,17 +102,17 @@ module Api
         end
       end
     rough_json = { 
-      year =>  {
-        "results":
-        [
+       
+        
+    year =>   [
           {"buildings": @ready_buildings},
           {"people": @ready_people},
           {"documents": @ready_documents},
           {"stories": @ready_narratives},
           {"media": @ready_media},
-        ],
+    ]
         
-      }
+      
     }
     rough_count = {
     year=>

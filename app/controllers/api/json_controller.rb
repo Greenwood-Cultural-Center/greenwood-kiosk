@@ -6,6 +6,12 @@ module Api
  
     def json
       @ready_json=[]
+      @final_buildings= 0
+      @final_people= 0 
+      @final_documents= 0 
+      @final_census_records= 0
+      @final_stories= 0 
+      @final_media= 0
       list_years = ['1910','1920']
 
       list_years.each do |list_year|
@@ -54,7 +60,22 @@ module Api
 
       @finished_json = build_json(list_year)
       @ready_json.append(@finished_json)
+
       end
+
+      total_count ={"Total" => {
+        
+        
+          "buildings": @final_buildings,
+          "people": @final_people,
+          "documents": @final_documents,
+          "census_records": @final_census_records,
+          "stories": @final_stories,
+          "media": @final_media,
+        
+
+      }}
+      @ready_json.append(total_count)
       response.set_header('Access-Control-Allow-Origin', '*')
       render json: @ready_json
     end
@@ -98,6 +119,16 @@ module Api
         }
       }
     }
+    
+    @final_buildings+=@ready_buildings.count
+    @final_people+=@ready_people.count
+    @final_documents+=@ready_documents.count
+    @final_census_records+=census_records
+    @final_stories+= @ready_narratives.count
+    @final_media+=media_count
+    
+    return rough_json
+
     end
     def make_building(record,year)
       def get_media(record)

@@ -43,8 +43,7 @@ namespace :import do
     end
   end
 
-  desc 'Import census file into HistoryForge, updating if it exists'
-  task :census, %i[year import] => [:environment] do |task, args|
+  task census: :environment do
     year = ENV.fetch('YEAR', nil)
     raise ArgumentError('You must pass in a YEAR argument') if year.blank?
 
@@ -53,49 +52,54 @@ namespace :import do
 
     rows_count = 0
     saved_count = 0
-    failed_records = []
-    failed_reasons = []
 
     Setting.load
 
     require 'csv'
 
-    rows = CSV.read(csv_file, headers: true)
+    CSV.foreach(csv_file, headers: true) do |row|
+      record =Parcel.find_or_initialize_by(
+        parcelid: row['ParcelID'],
+        sheet: row['Sheet'],
+        row: row['Row'],
+        grantor: row['Grantor'],
+        grantee: row['Grantee'],
+        instrument: row['Instrument'],
+        lots:[row['Lot(s)']],
+        block:row['Block'],
+        subdivision:row['Subdivision'],
+        book:row['Book'],
+        page:row['Page'],
+        date:row['Date'],
+        dl:row['DL'],
+        document_link:row['Document Link'],
+        contact_link:row['Concat Link']
+      )
+      rows_count += 1
+      record.save && saved_count += 1
+      puts "Managed to load #{saved_count} of #{rows_count} records.\n"
+    end
+  end
 
-    elapsed = Benchmark.realtime do
-      Parallel.each_with_index(rows, in_threads: 10) do |row, index|
-        puts "Processing row #{index + 2}..."
-        record = CensusRecord.for_year(year).find_or_initialize_by(
-          city: row['City'],
-          ward: row['Ward'],
-          enum_dist: row['Enum Dist'],
-          page_number: row['Sheet'],
-          page_side: row['Side'],
-          line_number: row['Line']
-        )
-
-        row.each do |key, value|
-          if key == 'Locality'
-            record.locality = Locality.find_or_create_by(name: value, short_name: value)
-          elsif !value.nil? && value != ''
-            attribute = begin
-              DataDictionary.field_from_label(key, year)
-            rescue StandardError
-              nil
+      row.each do |key, value|
+        if key == 'Locality'
+          record.locality = Locality.find_or_create_by(name: value,short_name:value)
+        elsif !value.nil? && value != ''
+          attribute = DataDictionary.field_from_label(key, year) rescue nil
+          dc_attribute = attribute&.downcase&.strip
+          if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
+            
+            if value == 'Yes'
+              record[dc_attribute] = true
+            elsif DataDictionary.coded_attribute?(dc_attribute)
+              code = DataDictionary.code_from_label(value, dc_attribute)
+              record[dc_attribute] = code
+            else
+              record[dc_attribute] = value
             end
-            dc_attribute = attribute&.downcase&.strip
-            if dc_attribute && record.has_attribute?(dc_attribute) && dc_attribute != 'person_id'
-              if value == 'Yes'
-                record[dc_attribute] = true
-              elsif DataDictionary.coded_attribute?(dc_attribute)
-                code = DataDictionary.code_from_label(value, dc_attribute)
-                record[dc_attribute] = code
-              else
-                record[dc_attribute] = value
-              end
-            end
-          end
         end
+      end
+    end
 
         record.created_by = User.first
 

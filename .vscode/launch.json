@@ -36,11 +36,7 @@
             "name": "Import 1920 Census",
             "type": "ruby_lsp",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/rake import:census",
-            "env": {
-                "YEAR": "1920",
-                "FILE": "/workspaces/greenwood-kiosk/census/1920.csv"
-            }
+            "program": "rake 'import:census_parallel[1920,${workspaceFolder}/census/1920_XY.csv,true,false]'",
         }
     ],
     "inputs": [

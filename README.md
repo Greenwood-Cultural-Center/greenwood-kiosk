@@ -6,7 +6,9 @@ This is HistoryForge. It is a basic Rails application.
 
 ## Development Setup
 
-### Using Dev Containers (Recommended)
+For detailed setup instructions, see [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md).
+
+### Using Dev Containers
 
 This project includes a fully configured development container that eliminates environment setup issues and provides optimal performance.
 

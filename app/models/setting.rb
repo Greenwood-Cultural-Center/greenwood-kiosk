@@ -35,6 +35,8 @@ class Setting < ApplicationRecord
     end
 
     def load
+      return unless table_exists?
+
       self.current = Rails.cache.fetch('settings') do
         all.index_by(&:key)
       end

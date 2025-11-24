@@ -1,29 +1,57 @@
-bin/deploy
-log/
-.git/
-tmp/
-test/
-scripts/
-ssl/
-storage/
-node_modules/
-public/packs-test/
-tmp/
-node_modules/
-bitbucket-pipelines.yml
-config/master.key
-docker-compose.yml
-.dockerignore
-Dockerfile
-README.md
-README.rdoc
-.byebug-history
-.env
-.env*
+# Git
 .git
 .gitignore
-.cache
-.gitlab-ci.yml
-LICENSE.md
-README.mdlog/*
-*.dump
+
+# Documentation
+*.md
+README.md
+LOCAL_DEV_SETUP.md
+
+# Logs
+log/*
+tmp/*
+*.log
+
+# Dependencies (will be installed in container)
+node_modules
+vendor/bundle
+
+# Build artifacts
+app/assets/builds/*
+public/assets/*
+public/packs/*
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
+# Devcontainer
+.devcontainer
+
+# Test coverage
+coverage
+
+# Temporary files
+*.tmp
+*.bak

@@ -1,0 +1,120 @@
+name: Deploy to Linode Production
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Linode Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Linode via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: ${{ secrets.LINODE_USER }}
+          key: ${{ secrets.LINODE_SSH_KEY }}
+          port: 5422
+          script: |
+            set -e
+
+            echo "🚀 Starting deployment to Linode Production..."
+            echo "================================================"
+
+            # Navigate to application directory
+            cd /var/www/greenwood-kiosk
+
+            # Show current state
+            echo "📍 Current location: $(pwd)"
+            echo "📝 Current commit: $(git log -1 --oneline)"
+
+            # Fetch latest code
+            echo ""
+            echo "📥 Fetching latest code from GitHub..."
+            sudo -u rails git fetch origin
+            sudo -u rails git reset --hard origin/master
+
+            echo "✅ Updated to commit: $(git log -1 --oneline)"
+
+            # Install Ruby dependencies
+            echo ""
+            echo "💎 Installing Ruby dependencies..."
+            sudo -u rails bash -lc 'cd /var/www/greenwood-kiosk && bundle install --deployment --without development test'
+
+            # Install JavaScript dependencies (if package.json changed)
+            if git diff HEAD@{1} HEAD --name-only | grep -q "package.json\|yarn.lock"; then
+              echo ""
+              echo "📦 Installing JavaScript dependencies..."
+              sudo -u rails bash -lc 'cd /var/www/greenwood-kiosk && yarn install --frozen-lockfile'
+            else
+              echo ""
+              echo "⏭️  Skipping JavaScript dependencies (no changes)"
+            fi
+
+            # Run database migrations
+            echo ""
+            echo "🗄️  Running database migrations..."
+            sudo -u rails bash -lc 'cd /var/www/greenwood-kiosk && RAILS_ENV=production bundle exec rails db:migrate'
+
+            # Precompile assets (if assets changed)
+            if git diff HEAD@{1} HEAD --name-only | grep -q "app/assets\|app/javascript"; then
+              echo ""
+              echo "🎨 Precompiling assets..."
+              sudo -u rails bash -lc 'cd /var/www/greenwood-kiosk && RAILS_ENV=production bundle exec rails assets:precompile'
+            else
+              echo ""
+              echo "⏭️  Skipping asset precompilation (no changes)"
+            fi
+
+            # Restart Rails application
+            echo ""
+            echo "🔄 Restarting Rails application..."
+            sudo systemctl restart greenwood-admin.service
+
+            # Wait a moment for service to start
+            sleep 3
+
+            # Check service status
+            echo ""
+            echo "📊 Service Status:"
+            sudo systemctl status greenwood-admin.service --no-pager -l | head -20 || true
+
+            # Check if service is running
+            if sudo systemctl is-active --quiet greenwood-admin.service; then
+              echo ""
+              echo "✅ Service is RUNNING"
+            else
+              echo ""
+              echo "❌ WARNING: Service may not be running properly!"
+              exit 1
+            fi
+
+            # Show recent logs
+            echo ""
+            echo "📜 Recent logs (last 10 lines):"
+            sudo journalctl -u greenwood-admin.service -n 10 --no-pager || true
+
+            echo ""
+            echo "================================================"
+            echo "🎉 Deployment completed successfully!"
+            echo "================================================"
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Deployment to Linode successful!"
+          echo "Deployed commit: ${{ github.sha }}"
+          echo "By: ${{ github.actor }}"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment to Linode FAILED!"
+          echo "Check the logs above for details"
+          exit 1

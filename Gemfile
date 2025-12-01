@@ -84,3 +84,4 @@ group :test do
   gem "faker"
   gem "rspec-collection_matchers"
 end
+gem "rack-cors"
